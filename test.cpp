@@ -104,22 +104,15 @@ int testusenet1(std::string &hostname, std::string &port,
 	// Create instance of class nntp.
 	nntp::nntp nntp;
 
-	// Connect to the usenet server. Check if SSL was true.
-	if (ssl == "true") {
-		if (nntp.sslconnect(hostname, port))
-			std::cout << "Succesfully connected to usenet.\n";
-		else {
-			std::cerr << "Problem connecting to usenet.\n";
-			return 1;
-		}
-	}
+	bool encrypt = false;
+	if (ssl == "true")
+		encrypt = true;
+	// Connect to the usenet server.
+	if (nntp.connect(hostname, port, encrypt))
+		std::cout << "Succesfully connected to usenet.\n";
 	else {
-		if (nntp.connect(hostname, port))
-			std::cout << "Succesfully connected to usenet.\n";
-		else {
-			std::cerr << "Problem connecting to usenet.\n";
-			return 1;
-		}
+		std::cerr << "Problem connecting to usenet.\n";
+		return 1;
 	}
 
 	/* This will log in to usenet using the supplied password
@@ -170,22 +163,15 @@ int testusenet2(std::string &hostname, std::string &port,
 	// Create instance of class nntp.
 	nntp::nntp nntp;
 
-	// Connect to the usenet server. Check if SSL was true.
-	if (ssl == "true") {
-		if (nntp.sslconnect(hostname, port))
-			std::cout << "Succesfully connected to usenet.\n";
-		else {
-			std::cerr << "Problem connecting to usenet.\n";
-			return 1;
-		}
-	}
+	bool encrypt = false;
+	if (ssl == "true")
+		encrypt = true;
+	// Connect to the usenet server.
+	if (nntp.connect(hostname, port, encrypt))
+		std::cout << "Succesfully connected to usenet.\n";
 	else {
-		if (nntp.connect(hostname, port))
-			std::cout << "Succesfully connected to usenet.\n";
-		else {
-			std::cerr << "Problem connecting to usenet.\n";
-			return 1;
-		}
+		std::cerr << "Problem connecting to usenet.\n";
+		return 1;
 	}
 
 	/* This will log in to usenet using the supplied password
@@ -284,7 +270,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	 * and disconnect from usenet, then reconnect at a later time.
 	 */
 	nntp.disconnect();
-	if (nntp.sslconnect(hostname, port))
+	if (nntp.connect(hostname, port, encrypt))
 		std::cout << "Connected to usenet.\n";
 	else {
 		std::cerr << "Problem connecting to usenet.\n";

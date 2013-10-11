@@ -58,24 +58,8 @@ namespace nntp
 		~nntp();
 
 		/**
-		 * Connects to usenet using SSL.
-		 *
-		 * @note This passes the authinfo user and passwords command
-		 * to usenet, then outputs the response to the command line.
-		 * @public
-		 *
-		 * @param  hostname = The NNTP server address.
-		 * @param      port = The NNTP port.
-		 * @return     bool = Did we connect?
-		 */
-		bool sslconnect(const std::string &hostname, const std::string &port);
-
-		/**
 		 * Connects to usenet without SSL.
 		 *
-		 * This passes the authinfo user and passwords command to usenet,
-		 * then outputs the usenet response to the command line.
-		 *
 		 * @note This passes the authinfo user and passwords command
 		 * to usenet, then outputs the response to the command line.
 		 * @public
@@ -84,7 +68,7 @@ namespace nntp
 		 * @param      port = The NNTP port.
 		 * @return     bool = Did we connect?
 		 */
-		bool connect(const std::string &hostname, const std::string &port);
+		bool connect(const std::string &hostname, const std::string &port, const bool &ssl);
 
 		/**
 		 * Disconnects from usenet.

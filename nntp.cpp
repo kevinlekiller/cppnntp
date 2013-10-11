@@ -20,7 +20,7 @@ namespace nntp {
 	}
 
 	/**
-	 * Connects to usenet using SSL.
+	 * Connects to usenet.
 	 *
 	 * @note This passes the authinfo user and passwords command
 	 * to usenet, then outputs the response to the command line.
@@ -28,33 +28,19 @@ namespace nntp {
 	 *
 	 * @param  hostname = The NNTP server address.
 	 * @param      port = The NNTP port.
+	 * @param       ssl = Does this connection require SSL?
 	 * @return     bool = Did we connect?
 	 */
-	bool nntp::sslconnect(const std::string &hostname, const std::string &port) {
-		if (!sock.sslconnect(hostname, port))
-			return false;
-
-		posting = sock.poststatus();
-		return true;
-	}
-
-	/**
-	 * Connects to usenet without SSL.
-	 *
-	 * This passes the authinfo user and passwords command to usenet,
-	 * then outputs the usenet response to the command line.
-	 *
-	 * @note This passes the authinfo user and passwords command
-	 * to usenet, then outputs the response to the command line.
-	 * @public
-	 *
-	 * @param  hostname = The NNTP server address.
-	 * @param      port = The NNTP port.
-	 * @return     bool = Did we connect?
-	 */
-	bool nntp::connect(const std::string &hostname, const std::string &port) {
-		if (!sock.connect(hostname, port))
-			return false;
+	bool nntp::connect(const std::string &hostname,
+						const std::string &port, const bool &ssl) {
+		if (ssl) {
+			if (!sock.sslconnect(hostname, port))
+				return false;
+		}
+		else {
+			if (!sock.connect(hostname, port))
+				return false;
+		}
 
 		posting = sock.poststatus();
 		return true;
@@ -68,8 +54,7 @@ namespace nntp {
 	 * @public
 	 */
 	void nntp::disconnect() {
-		if (sock.is_connected())
-		{
+		if (sock.is_connected()) {
 			sock.send_command("QUIT");
 			sock.read_line(RESPONSECODE_DISCONNECTING_REQUESTED);
 		}
