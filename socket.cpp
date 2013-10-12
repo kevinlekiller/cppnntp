@@ -627,7 +627,7 @@ namespace nntp {
 			bool done = false;
 			std::string resp = "";
 			do {
-				// Create an array, max 1024 chars to store the buffer.
+				// Boost doesn't seem to like gzip data, so create a normal array.
 				char buffer[1024];
 				// Store the buffer into the array, get the size.
 				size_t bytesRead;
