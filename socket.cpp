@@ -681,7 +681,7 @@ namespace nntp {
 					respfound = true;
 			}
 			else {
-				// Remove .crlf
+				// Remove .CRLF
 				if (finalbuffer[i] == '.'
 					&& finalbuffer[i+1] == '\r'
 					&& finalbuffer[i+2] == '\n')
@@ -717,11 +717,9 @@ namespace nntp {
 				// Copy the data.
 				boost::iostreams::copy(in, copyback);
 
-				// Put the copied data inside finalbuffer.
-				finalbuffer = copyback.str();
-				// Add back the response and .crlf.
+				// The response + the decompressed data + .CRLF
 				finalbuffer = respline + '\n'
-					+ finalbuffer + '.' + '\r' + '\n';
+					+ copyback.str() + '.' + '\r' + '\n';
 
 				return true;
 			 } catch (boost::iostreams::zlib_error& e) {
