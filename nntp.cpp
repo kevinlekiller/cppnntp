@@ -620,10 +620,6 @@ namespace nntp {
 	void nntp::parseheaders(std::string &finalbuffer) {
 		bool respfound = false;
 
-		// When using comp the response is not compressed, so don't try to parse it.
-		if (sock.compressionstatus())
-			respfound = true;
-
 		// Loop over the buffer and parse the header lines.
 		std::string respline, curheader = "";
 		for (unsigned long i = 0; i < (finalbuffer.length() - 2); i++) {

@@ -274,6 +274,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	if (xfeature == "true") {
 		/* Send the Xfeature GZIP command.
 		*/
+		std::cout << "\nExample of enabling compression:\n";
 		if (nntp.xfeaturegzip())
 			std::cout << "XFEATURE GZIP COMPRESSION enabled.\n";
 		else

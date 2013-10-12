@@ -677,10 +677,8 @@ namespace nntp {
 			if (!respfound) {
 				if (finalbuffer[i] != '\n')
 					respline += finalbuffer[i];
-				else {
-					std::cout << respline << std::endl;
+				else
 					respfound = true;
-				}
 			}
 			else {
 				// Remove .crlf
@@ -704,10 +702,12 @@ namespace nntp {
 
 			// Try to decompress the data, catch zlib errors.
 			try {
+
 				// Create a string stream to store the gzip data.
 				std::stringstream ss(newbuffer);
 				// Create a string stream to store the decompressed data.
 				std::stringstream copyback;
+
 				// Create a decompress object.
 				boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
 				// Tell it to use zlib.
@@ -716,12 +716,13 @@ namespace nntp {
 				in.push(ss);
 				// Copy the data.
 				boost::iostreams::copy(in, copyback);
+
 				// Put the copied data inside finalbuffer.
 				finalbuffer = copyback.str();
-				// Now add back .crlf
-				finalbuffer += '.';
-				finalbuffer += '\r';
-				finalbuffer += '\n';
+				// Add back the response and .crlf.
+				finalbuffer = respline + '\n'
+					+ finalbuffer + '.' + '\r' + '\n';
+
 				return true;
 			 } catch (boost::iostreams::zlib_error& e) {
 				std::cerr << e.what() << std::endl;
