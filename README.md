@@ -21,3 +21,44 @@ and examples on what most of the things do.
 
 (Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54).
 g++ test.cpp nntp.cpp boostRegexExceptions.cpp socket.cpp yencdecode.cpp -o "test" -lboost_system -lpthread -lboost_regex -std=c++11 -lboost_thread -lssl -lcrypto
+
+
+------------------------------------------------------------------------
+Some info for me:
+
+Current commands implemented:
+
+AUTHINFO      (login)
+ARTICLE       (only outputs to CLI, use body if you need the message)
+BODY          
+DATE          (need to parse this with BOOST)
+GROUP         
+HEAD          
+HELP          
+LISTGROUP     (need to do more testing on this)
+POST          
+STAT          (not tested yet)
+XOVER         (need to store the headers in an array)
+
+
+Implemented but not working:
+
+XFEATURE GZIP COMPRESS
+
+
+Not implemented:
+
+CAPABILITIES  
+IHAVE         
+LAST          
+LIST          
+MODE READER   (not needed?)
+NEWGROUPS     
+NEWNEWS       
+NEXT          
+OVER          (RFC3977 2006, none of my NNTP providers have this, it's
+the same as RFC2980 2000's XOVER which all my providers have)
+XHDR          (RFC3977 = HDR, none of my servers have HDR, this command
+seems to only display the article number + the subect)
+
+
