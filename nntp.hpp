@@ -289,11 +289,14 @@ namespace nntp
 		/**
 		 * Post an article to usenet.
 		 * 
-		 * @note Work in progress.
+		 * @note Posts a single article, it checks if you have posting
+		 * rights, however some servers tell us we can post when we cannot
+		 * (newshosting for example), so make sure to know if you have
+		 * posting privelege before hand.
 		 * @public
 		 * 
 		 * @param from = The person who is posting the message.
-		 * @example = Demo User <nobody@example.net>
+		 * @example = "Demo User" <nobody@example.net>
 		 * 
 		 * @param groups = The group or list of groups.
 		 * @example = alt.binaries.test
