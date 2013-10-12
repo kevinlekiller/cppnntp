@@ -26,8 +26,17 @@ namespace nntp {
 	 *
 	 * @param status = Set compression to true or false.
 	 */
-	void socket::compressionstatus(const bool &status) {
+	void socket::togglecompression(const bool &status) {
 		compression = status;
+	}
+
+	/**
+	 * Return compression status.
+	 *
+	 * @public
+	 */
+	bool socket::compressionstatus() {
+		return compression;
 	}
 
 	/**
@@ -237,9 +246,9 @@ namespace nntp {
 							done = true;
 						}
 						else {
-							std::cout << "Error connecting to usenet: ";
-							std::cout.write(buffer.data(), bytesRead);
-							std::cout << std::endl;
+							std::cerr << "Error connecting to usenet: ";
+							std::cerr.write(buffer.data(), bytesRead);
+							std::cerr << std::endl;
 							return false;
 						}
 					} while (!done);
@@ -484,10 +493,6 @@ namespace nntp {
 	 * @return     bool = Did we succeed?
 	 */
 	bool socket::read_lines(const responsecodes &response) {
-		// Check if gzip compression is on.
-		//if (compression)
-			//return read_compressed_lines(response);
-
 		// Read until we find the period.
 		try {
 			bool done = false;
@@ -549,10 +554,11 @@ namespace nntp {
 	 * @param  finalbuffer = Pass a string reference to store the buffer.
 	 * @return        bool = Did we succeed?
 	 */
-	bool socket::read_lines(const responsecodes &response, std::string &finalbuffer) {
+	bool socket::read_lines(const responsecodes &response,
+		std::string &finalbuffer) {
 		// Check if gzip compression is on.
-		//if (compression)
-			//return read_compressed_lines(response);
+		if (compression)
+			return read_compressed_lines(response, finalbuffer);
 
 		// Read until we find the period.
 		try {
@@ -568,9 +574,6 @@ namespace nntp {
 					bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
 				else
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
-
-				// Prints the buffer sent from usenet.
-				//std::cout.write(buffer.data(), bytesRead);
 
 				// Append the current buffer to the final buffer.
 				unsigned short iter = 0;
@@ -610,55 +613,122 @@ namespace nntp {
 	/**
 	 * Read lines sent back from usenet used when using gzip compress.
 	 *
-	 * @note Not started working on this yet.
+	 * @note For multi line commands that can be compressed (XOVER).
 	 * @private
 	 *
 	 * @param  response = The expected response from the NNTP server
 	 *                    for the passed command.
 	 * @return     bool = Did we succeed?
 	 */
-	bool socket::read_compressed_lines(const responsecodes &response) {
+	bool socket::read_compressed_lines(const responsecodes &response,
+				std::string &finalbuffer) {
 		// Read until we find the period.
 		try {
-		bool done = false;
-		std::string resp = "";
-		do {
-			// Create an array, max 1024 chars to store the buffer.
-			boost::array<char, 1024> buffer;
-			// Store the buffer into the array, get the size.
-			size_t bytesRead;
-			if (tcp_sock != NULL)
-				bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
-			else
-				bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
+			bool done = false;
+			std::string resp = "";
+			do {
+				// Create an array, max 1024 chars to store the buffer.
+				//boost::array<char, 1024> buffer;
+				char buffer[1024];
+				// Store the buffer into the array, get the size.
+				size_t bytesRead;
+				if (tcp_sock != NULL)
+					bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
+				else
+					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
-			// Prints the buffer sent from usenet.
-			std::cout.write(buffer.data(), bytesRead);
+				// Append the current buffer to the final buffer.
+				unsigned short iter = 0;
+				while (iter < bytesRead)
+					finalbuffer += buffer[iter++];
 
-			// Get the 3 first chars of the array, the response.
-			if (resp == "") {
-				resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
-				if (std::stoi(resp) != response)
-					return false;
-			}
-
-			// Look for the terminator (.\r\n)
-			if (buffer[bytesRead-3] == '.'
-				&& buffer[bytesRead-2] == '\r'
-				&& buffer[bytesRead-1] == '\n') {
-				// Check if the response is good (convert resp to int).
-				if (std::stoi(resp) == response)
-					done = true;
-				else {
-					std::cerr << "NNTP error: Wrong response code from usenet.\n";
-					return false;
+				// Get the 3 first chars of the array, the response.
+				if (resp == "") {
+					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					if (std::stoi(resp) != response)
+						return false;
 				}
-			}
-		} while (!done);
+
+				// Look for the terminator (.\r\n)
+				if (buffer[bytesRead-3] == '.'
+					&& buffer[bytesRead-2] == '\r'
+					&& buffer[bytesRead-1] == '\n') {
+					// Check if the response is good (convert resp to int).
+					if (std::stoi(resp) == response)
+						done = true;
+					else {
+						std::cerr << "NNTP error: Wrong response code from usenet.\n";
+						return false;
+					}
+				}
+			} while (!done);
 		} catch (boost::system::system_error& error) {
 			std::cerr << "NNTP error: " << error.what() << std::endl;
 			return false;
 		}
-		return true;
+		return parsecompressedbuffer(finalbuffer);
+	}
+
+	bool socket::parsecompressedbuffer(std::string &finalbuffer) {
+		bool respfound = false;
+		std::string newbuffer, respline = "";
+		// Remove the response and .CRLF from the end.
+		for (unsigned long i = 0; i < (finalbuffer.length()); i++) {
+			// Skip response, it's the first line.
+			if (!respfound) {
+				if (finalbuffer[i] != '\n')
+					respline += finalbuffer[i];
+				else {
+					std::cout << respline << std::endl;
+					respfound = true;
+				}
+			}
+			else {
+				// Remove .crlf
+				if (finalbuffer[i] == '.'
+					&& finalbuffer[i+1] == '\r'
+					&& finalbuffer[i+2] == '\n')
+					break;
+				// Tack on the rest.
+				else
+					newbuffer += finalbuffer[i];
+			}
+		}
+
+		// Check if the first char is a x.
+		if (newbuffer[0] != 120)
+			return false;
+
+		// Check if the 2nd char is representative of a gzip header start.
+		if (newbuffer[1] == 1 || newbuffer[1] == 94
+			|| newbuffer[1] == 156 || newbuffer[1] == 218) {
+
+			// Try to decompress the data, catch zlib errors.
+			try {
+				// Create a string stream to store the gzip data.
+				std::stringstream ss(newbuffer);
+				// Create a string stream to store the decompressed data.
+				std::stringstream copyback;
+				// Create a decompress object.
+				boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+				// Tell it to use zlib.
+				in.push(boost::iostreams::zlib_decompressor());
+				// Decompress the data.
+				in.push(ss);
+				// Copy the data.
+				boost::iostreams::copy(in, copyback);
+				// Put the copied data inside finalbuffer.
+				finalbuffer = copyback.str();
+				// Now add back .crlf
+				finalbuffer += '.';
+				finalbuffer += '\r';
+				finalbuffer += '\n';
+				return true;
+			 } catch (boost::iostreams::zlib_error& e) {
+				std::cerr << e.what() << std::endl;
+				return false;
+			}
+		}
+		return false;
 	}
 }

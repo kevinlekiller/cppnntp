@@ -19,8 +19,10 @@ change the article numbers), then compile. You can comment out parts
 of test.cpp or edit parts of it to do different things, it has comments
 and examples on what most of the things do.
 
+Zlib is required for XFEATURE GZIP COMPRESS.
+
 (Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54).
-g++ test.cpp nntp.cpp boostRegexExceptions.cpp socket.cpp yencdecode.cpp -o "test" -lboost_system -lpthread -lboost_regex -std=c++11 -lboost_thread -lssl -lcrypto
+g++ test.cpp nntp.cpp boostRegexExceptions.cpp socket.cpp yencdecode.cpp -o "test" -lboost_system -lpthread -lboost_regex -std=c++11 -lboost_thread -lssl -lcrypto -lz -lboost_iostreams
 
 
 ------------------------------------------------------------------------
@@ -49,12 +51,9 @@ POST
 
 STAT          (not tested yet)
 
-XOVER         (need to store the headers in an array)
-
-
-Implemented but not working:
-
 XFEATURE GZIP COMPRESS
+
+XOVER         (need to store the headers in an array)
 
 
 Not implemented:

@@ -411,7 +411,8 @@ namespace nntp {
 		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer))
 			return false;
 
-		parseheaders(finalbuffer);
+		if (finalbuffer != "")
+			parseheaders(finalbuffer);
 		return true;
 	}
 
@@ -435,7 +436,8 @@ namespace nntp {
 		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer))
 			return false;
 
-		parseheaders(finalbuffer);
+		if (finalbuffer != "")
+			parseheaders(finalbuffer);
 		return true;
 	}
 
@@ -467,7 +469,8 @@ namespace nntp {
 		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS))
 			return false;
 
-		parseheaders(finalbuffer);
+		if (finalbuffer != "")
+			parseheaders(finalbuffer);
 		return true;
 	}
 
@@ -550,8 +553,6 @@ namespace nntp {
 	 * @return bool = Does the server recognize the command?
 	 */
 	bool nntp::xfeaturegzip() {
-		// Return false, not functional yet.
-		return false;
 		if (!sock.send_command("XFEATURE COMPRESS GZIP"))
 			return false;
 
@@ -559,7 +560,7 @@ namespace nntp {
 			return false;
 
 		// Enable the compression flag in socket.
-		sock.compressionstatus(true);
+		sock.togglecompression(true);
 		return true;
 	}
 
@@ -616,14 +617,20 @@ namespace nntp {
 	 *
 	 * @param   finalbuffer = The buffer reference.
 	 */
-	void nntp::parseheaders(const std::string &finalbuffer) {
+	void nntp::parseheaders(std::string &finalbuffer) {
+		bool respfound = false;
+
+		// When using comp the response is not compressed, so don't try to parse it.
+		if (sock.compressionstatus())
+			respfound = true;
+
 		// Loop over the buffer and parse the header lines.
 		std::string respline, curheader = "";
-		bool respfound = false;
-		// Split the lines first.
 		for (unsigned long i = 0; i < (finalbuffer.length() - 2); i++) {
+
 			// Get the response, it's the first line.
 			if (!respfound) {
+
 				if (finalbuffer[i] != '\r')
 					respline += finalbuffer[i];
 				else {
@@ -633,24 +640,31 @@ namespace nntp {
 			}
 			// Go over the header lines.
 			else {
+
 				// Remove the new lines.
 				if (finalbuffer[i] == '\n')
 					continue;
+
 				// Tack on chars to curheader until we find cr.
 				if (finalbuffer[i] != '\r')
 					curheader += finalbuffer[i];
 				else {
-					// Tack on a tab to the end to get the xref.
+
+					// Add on a tab to the end to get the xref.
 					curheader += '\t';
+
 					unsigned long linenumber = 1;
 					std::string curline = "";
+
 					// Loop over curheader, add chars until we find a tab.
 					for (unsigned long it = 0; it <= curheader.length(); it++) {
+
 						if (curheader[it] != '\t')
 							curline += curheader[it];
 						else {
+
 							// Print the line type.
-							switch (linenumber) {
+							switch (linenumber++) {
 								case 1:
 									std::cout << "Number: ";
 									break;
@@ -680,8 +694,7 @@ namespace nntp {
 									linenumber = 0;
 									break;
 							}
-							// Increment the line number.
-							linenumber++;
+
 							// Print the current line.
 							std::cout << curline << std::endl;
 							// Reset the current line.

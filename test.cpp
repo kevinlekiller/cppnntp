@@ -13,7 +13,8 @@ bool readconf(std::string &hostname, std::string &port,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
 				std::string &messageid, std::string &path,
-				std::string &posting, std::string &head) {
+				std::string &posting, std::string &head,
+				std::string &xfeature) {
 
 	// Create a string to hold the file.
 	std::string line;
@@ -75,6 +76,8 @@ bool readconf(std::string &hostname, std::string &port,
 					posting = match[2];
 				else if (match[1] == "HEAD")
 					head = match[2];
+				else if (match[1] == "XFEATURE_GZIP")
+					xfeature = match[2];
 			}
 		} catch (boost::regex_error& e) {
 			boostRegexExceptions(e);
@@ -105,7 +108,8 @@ int testusenet1(std::string &hostname, std::string &port,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
 				std::string &messageid, std::string &path,
-				std::string &posting, std::string &head) {
+				std::string &posting, std::string &head,
+				std::string &xfeature) {
 
 	std::cout << "Start of first set of examples.\n";
 
@@ -216,7 +220,8 @@ int testusenet2(std::string &hostname, std::string &port,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
 				std::string &messageid, std::string &path,
-				std::string &posting, std::string &head) {
+				std::string &posting, std::string &head,
+				std::string &xfeature) {
 
 	std::cout << "\nStart of second set of examples.\n";
 
@@ -261,9 +266,19 @@ int testusenet2(std::string &hostname, std::string &port,
 	 */
 	std::cout << "\nExample of group objects:\n"
 	<< "Group name: " << nntp.group_name() << std::endl
-	<< "Group's newest article: " << nntp.group_newest()
-	<< "Group's oldest article: " << std::endl << nntp.group_oldest() << std::endl
+	<< "Group's newest article: " << nntp.group_newest() << std::endl
+	<< "Group's oldest article: " << nntp.group_oldest() << std::endl
 	<< "Total amount of articles for the group: " << nntp.group_total() << std::endl;
+
+
+	if (xfeature == "true") {
+		/* Send the Xfeature GZIP command.
+		*/
+		if (nntp.xfeaturegzip())
+			std::cout << "XFEATURE GZIP COMPRESSION enabled.\n";
+		else
+			std::cerr << "Problem enabling XFEATURE GZIP COMPRESSION.\n";
+	}
 
 	if (xover == "true") {
 		/* Send the XOVER command which displays an header with
@@ -353,19 +368,19 @@ int testusenet2(std::string &hostname, std::string &port,
 int main() {
 
 	// Create strings to store the settings in.
-	std::string hostname,port,username,password,group,
+	std::string hostname,port,username,password,group,xfeature,
 		xover,start,end,ssl,body,messageid,path,posting,head;
 
 	// Read the config file and store the settings in the strings.
 	if (!readconf(hostname, port, username, password, group, xover,
-		start, end, ssl, body, messageid, path, posting, head)) {
+		start, end, ssl, body, messageid, path, posting, head, xfeature)) {
 		std::cerr << "Error getting options from config.cfg\n";
 		return 1;
 	}
 
 	// Run the first set of tests.
 	if (testusenet1(hostname, port, username, password, group, xover,
-			start, end, ssl, body, messageid, path, posting, head) != 0)
+			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
 		return 1;
 
 	// Sleep for 2 seconds.
@@ -374,7 +389,7 @@ int main() {
 
 	// Run the second set of tests.
 	if (testusenet2(hostname, port, username, password, group, xover,
-			start, end, ssl, body, messageid, path, posting, head) != 0)
+			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
 		return 1;
 
 	return 0;

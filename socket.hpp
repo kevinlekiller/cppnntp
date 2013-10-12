@@ -2,6 +2,9 @@
 #include <boost/array.hpp>
 #include <boost/asio/ssl.hpp>
 #include <iostream>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include "responsecodes.hpp"
 
 namespace nntp
@@ -72,7 +75,14 @@ namespace nntp
 		 *
 		 * @param status = Set compression to true or false.
 		 */
-		void compressionstatus(const bool &status);
+		void togglecompression(const bool &status);
+
+		/**
+		 * Return compression status.
+		 *
+		 * @public
+		 */
+		bool compressionstatus();
 
 		/**
 		 * Close the socket.
@@ -212,6 +222,13 @@ namespace nntp
 		 *                    for the passed command.
 		 * @return     bool = Did we succeed?
 		 */
-		bool read_compressed_lines(const responsecodes &response);
+		bool read_compressed_lines(const responsecodes &response, std::string &finalbuffer);
+
+		/**
+		 * Decompress gzip buffer.
+		 * 
+		 * @public
+		 */
+		bool parsecompressedbuffer(std::string &finalbuffer);
 	};
 }
