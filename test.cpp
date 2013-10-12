@@ -12,7 +12,8 @@ bool readconf(std::string &hostname, std::string &port,
 				std::string &group, std::string &xover,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
-				std::string &messageid, std::string &path) {
+				std::string &messageid, std::string &path,
+				std::string &posting, std::string &head) {
 
 	// Create a string to hold the file.
 	std::string line;
@@ -70,6 +71,10 @@ bool readconf(std::string &hostname, std::string &port,
 					messageid = match[2];
 				else if (match[1] == "PATH")
 					path = match[2];
+				else if (match[1] == "POSTING")
+					posting = match[2];
+				else if (match[1] == "HEAD")
+					head = match[2];
 			}
 		} catch (boost::regex_error& e) {
 			boostRegexExceptions(e);
@@ -99,7 +104,8 @@ int testusenet1(std::string &hostname, std::string &port,
 				std::string &group, std::string &xover,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
-				std::string &messageid, std::string &path) {
+				std::string &messageid, std::string &path,
+				std::string &posting, std::string &head) {
 
 	std::cout << "Start of first set of examples.\n";
 
@@ -151,6 +157,48 @@ int testusenet1(std::string &hostname, std::string &port,
 		return 1;
 	}
 
+	if (posting == "true") {
+		/* Post an article to usenet.
+		*/
+		std::cout << "\nExample of posting an article:\n";
+
+		// From ; Who is posting the article.
+		std::string from = "Demo User <nobody@example.net>";
+		// Groups ; Where is the article going.
+		std::string groups = "alt.test.misc.test";
+		// Subject ; Subject of the article.
+		std::string subject = "I am just a test article";
+		// Message ; Contents of the article.
+		std::string message = "This is just a test article\r\n";
+		if (nntp.post(from, groups, subject, message))
+			std::cout << "Succesfully posted an article to usenet.\n";
+		else {
+			std::cerr << "Problem posting article to usenet, possibly your"
+			<< " NNTP server didn't give you the right to post articles.\n";
+			return 1;
+		}
+
+		std::cout << "\nTry to fetch the article we posted (also an example of ARTICLE command).\n";
+
+		/* We must select a group before downloading articles so
+		* let's select the group we posted to.
+		*/
+		if (!nntp.group(groups)) {
+			std::cerr << "Problem selecting the GROUP.\n";
+			return 1;
+		}
+
+		/* Download the newest article (which is probably ours, since
+		* this is a dead group).
+		*/
+		if (nntp.article(std::to_string(nntp.group_newest())))
+			std::cout << "Succesfully downloaded an article.\n";
+		else {
+			std::cerr << "Problem downloading the article.\n";
+			return 1;
+		}
+	}
+
 	std::cout << "\nEnd of first set of examples.\n";
 
 	 return 0;
@@ -167,7 +215,8 @@ int testusenet2(std::string &hostname, std::string &port,
 				std::string &group, std::string &xover,
 				std::string &start, std::string &end,
 				std::string &ssl, std::string &body,
-				std::string &messageid, std::string &path) {
+				std::string &messageid, std::string &path,
+				std::string &posting, std::string &head) {
 
 	std::cout << "\nStart of second set of examples.\n";
 
@@ -233,20 +282,6 @@ int testusenet2(std::string &hostname, std::string &port,
 		}
 	}
 
-	/* Send an ARTICLE command, this displays the header + body of
-	 * an article.
-	 *
-	 * I commented this out because the output is quite large and
-	 * the body + header commands will display overall the same
-	 * information.
-	 */
-	/*if (nntp.article(start))
-		std::cout << "Succesfully downloaded an article.\n";
-	else {
-		std::cerr << "Problem downloading the article.\n";
-		return 1;
-	}*/
-
 	if (body == "true") {
 		/* Send an BODY command and store the decoded yEnc on disk.
 		 * In this example it fetches a rar file (the message-id in
@@ -279,16 +314,18 @@ int testusenet2(std::string &hostname, std::string &port,
 		}
 	}
 
-	/* This sends the HEAD command which displays a full article header,
-	 * unlike XOVER which only displays the more useful lines
-	 * of the article.
-	 */
-	std::cout << "\nExample of HEAD command:\n";
-	if (nntp.head(start))
-		std::cout << "Succesfully downloaded an article header with HEAD command.\n";
-	else {
-		std::cerr << "Problem downloading the article header with HEAD command.\n";
-		return 1;
+	if (head == "true") {
+		/* This sends the HEAD command which displays a full article header,
+		 * unlike XOVER which only displays the more useful lines
+		 * of the article.
+		 */
+		std::cout << "\nExample of HEAD command:\n";
+		if (nntp.head(start))
+			std::cout << "Succesfully downloaded an article header with HEAD command.\n";
+		else {
+			std::cerr << "Problem downloading the article header with HEAD command.\n";
+			return 1;
+		}
 	}
 
 	/* This is just an example to show we can keep the class instance
@@ -317,18 +354,18 @@ int main() {
 
 	// Create strings to store the settings in.
 	std::string hostname,port,username,password,group,
-		xover,start,end,ssl,body,messageid,path;
+		xover,start,end,ssl,body,messageid,path,posting,head;
 
 	// Read the config file and store the settings in the strings.
 	if (!readconf(hostname, port, username, password, group, xover,
-		start, end, ssl, body, messageid, path)) {
+		start, end, ssl, body, messageid, path, posting, head)) {
 		std::cerr << "Error getting options from config.cfg\n";
 		return 1;
 	}
 
 	// Run the first set of tests.
 	if (testusenet1(hostname, port, username, password, group, xover,
-					start, end, ssl, body, messageid, path) != 0)
+			start, end, ssl, body, messageid, path, posting, head) != 0)
 		return 1;
 
 	// Sleep for 2 seconds.
@@ -337,7 +374,7 @@ int main() {
 
 	// Run the second set of tests.
 	if (testusenet2(hostname, port, username, password, group, xover,
-					start, end, ssl, body, messageid, path) != 0)
+			start, end, ssl, body, messageid, path, posting, head) != 0)
 		return 1;
 
 	return 0;

@@ -287,6 +287,34 @@ namespace nntp
 		bool xover(const std::string &anumber, bool &direction);
 
 		/**
+		 * Post an article to usenet.
+		 * 
+		 * @note Work in progress.
+		 * @public
+		 * 
+		 * @param from = The person who is posting the message.
+		 * @example = Demo User <nobody@example.net>
+		 * 
+		 * @param groups = The group or list of groups.
+		 * @example = alt.binaries.test
+		 * @example = alt.binaries.test,alt.binaries.misc
+		 * 
+		 * @param subject = The subject of the article.
+		 * @example = I am just a test article
+		 * 
+		 * @param message = The message (body) of the article (you end it
+		 * with CRLF(\r\n)).
+		 * @example = This is just a test article.\r\n
+		 * @note Usenet has a limit of 512 chars per line when sending
+		 * a command (CRLF counts as 2 chars), if your message will
+		 * be longer than this you need to seperate each line with CRLF
+		 * 
+		 * @return bool = Did the server receive the article?
+		 */
+		bool post(const std::string &from, const std::string &groups,
+						const std::string &subject, std::string &message);
+
+		/**
 		 * Send XFEATURE COMPRESS GZIP command.
 		 *
 		 * @note Not currently functional.
@@ -310,6 +338,9 @@ namespace nntp
 		 * Are we allowed to post to the server?
 		 *
 		 * @note This is set when we connect to the server.
+		 * This is not accurate, my server sends back 200
+		 * (posting allowed) when connecting, however they still deny
+		 * me posting, but this does not hinder any functions.
 		 * @private
 		 */
 		bool posting = false;

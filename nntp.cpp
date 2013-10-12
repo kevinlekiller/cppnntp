@@ -472,6 +472,74 @@ namespace nntp {
 	}
 
 	/**
+	 * Post an article to usenet.
+	 * 
+	 * @note Posts a single article, it checks if you have posting
+	 * rights, however some servers tell us we can post when we cannot
+	 * (newshosting for example), so make sure to know if you have
+	 * posting privelege before hand.
+	 * @public
+	 * 
+	 * @param from = The person who is posting the message.
+	 * @example = "Demo User" <nobody@example.net>
+	 * 
+	 * @param groups = The group or list of groups.
+	 * @example = alt.binaries.test
+	 * @example = alt.binaries.test,alt.binaries.misc
+	 * 
+	 * @param subject = The subject of the article.
+	 * @example = I am just a test article
+	 * 
+	 * @param message = The message (body) of the article (you end it
+	 * with CRLF(\r\n)).
+	 * @example = This is just a test article.\r\n
+	 * @note Usenet has a limit of 512 chars per line when sending
+	 * a command (CRLF counts as 2 chars), if your message will
+	 * be longer than this you need to seperate each line with CRLF
+	 * 
+	 * @return bool = Did the server receive the article?
+	 */
+	bool nntp::post(const std::string &from, const std::string &groups,
+					const std::string &subject, std::string &message) {
+		if (!posting)
+			return false;
+
+		// Send the command to usenet we want to post.
+		if (!sock.send_command("POST"))
+			return false;
+
+		// Check if the response is good.
+		if (!sock.read_line(RESPONSECODE_POSTING_SEND))
+			return false;
+
+		std::string CRLF = "\r\n";
+
+		unsigned long mlth = message.length();
+		// Check if message ends in CRLF.
+		if (message[(mlth - 2)] != '\r' && message[(mlth - 1)] != '\n')
+			message += CRLF;
+
+		// Try to send the article.
+		if (!sock.send_command
+				(
+					"FROM: " + from + CRLF +
+					"NEWSGROUPS: " + groups + CRLF +
+					"SUBJECT: " + subject + CRLF +
+					"X-POSTER: cppnntlib" + CRLF + CRLF +
+					message + "."
+				)
+			) {
+			return false;
+		}
+
+		// Check if the response is good.
+		if (!sock.read_line(RESPONSECODE_POSTING_SUCCESS))
+			return false;
+
+		return true;
+	}
+
+	/**
 	 * Send XFEATURE COMPRESS GZIP command.
 	 *
 	 * @note Not currently functional.

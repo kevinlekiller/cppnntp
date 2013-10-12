@@ -293,13 +293,6 @@ namespace nntp {
 			// Add return + newline to the command.
 			std::string cmd = command + "\r\n";
 
-			// If the command is too long, return false.
-			if (strlen(cmd.c_str()) > 510) {
-				std::cerr << "NNTP error: The command you are trying to"
-				<< " send to usenet is too long\n";
-				return false;
-			}
-
 			// Send the command to usenet.
 			if (tcp_sock != NULL)
 				tcp_sock->write_some(boost::asio::buffer(cmd.c_str(), strlen(cmd.c_str())));
@@ -310,6 +303,58 @@ namespace nntp {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Read a single line response from usenet, return the response
+	 * code.
+	 *
+	 * @note   This is for commands where usenet returns 1 line.
+	 * @private
+	 *
+	 * @return The response code.
+	 */
+	unsigned short socket::read_reponse() {
+		unsigned short code = 0;
+		try {
+			bool done = false;
+			// Create a string to store the response.
+			std::string resp = "";
+			// Int to store code.
+			do {
+				// Create an array, max 1024 chars to store the buffer.
+				boost::array<char, 1024> buffer;
+				// Store the buffer into the array, get the size.
+				size_t bytesRead;
+				if (tcp_sock != NULL)
+					bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
+				else
+					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
+
+				// Prints the buffer sent from usenet.
+				std::cout.write(buffer.data(), bytesRead);
+
+				// Get the 3 first chars of the array, the response.
+				if (resp == "") {
+					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					code = std::stoi(resp);
+				}
+
+				// Check if we got the response.
+				if (code > 99)
+					done = true;
+				else {
+					std::cerr << "NNTP error: ";
+					std::cerr.write(buffer.data(), bytesRead);
+					std::cerr << std::endl;
+					return code;
+				}
+			} while (!done);
+		} catch (boost::system::system_error& error) {
+			std::cerr << "NNTP error: " << error.what() << std::endl;
+			return code;
+		}
+		return code;
 	}
 
 	/**
@@ -350,9 +395,9 @@ namespace nntp {
 				if (std::stoi(resp) == response)
 					done = true;
 				else {
-					std::cout << "NNTP error: ";
-					std::cout.write(buffer.data(), bytesRead);
-					std::cout << std::endl;
+					std::cerr << "NNTP error: ";
+					std::cerr.write(buffer.data(), bytesRead);
+					std::cerr << std::endl;
 					return false;
 				}
 			} while (!done);
@@ -411,9 +456,9 @@ namespace nntp {
 				if (std::stoi(resp) == response)
 					done = true;
 				else {
-					std::cout << "NNTP error: ";
-					std::cout.write(buffer.data(), bytesRead);
-					std::cout << std::endl;
+					std::cerr << "NNTP error: ";
+					std::cerr.write(buffer.data(), bytesRead);
+					std::cerr << std::endl;
 					return false;
 				}
 			} while (!done);

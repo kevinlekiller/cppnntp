@@ -132,6 +132,17 @@ namespace nntp
 		bool send_command(const std::string command);
 
 		/**
+		 * Read a single line response from usenet, return the response
+		 * code.
+		 *
+		 * @note   This is for commands where usenet returns 1 line.
+		 * @private
+		 *
+		 * @return The response code.
+		 */
+		unsigned short read_reponse();
+
+		/**
 		 * Read the line sent back from usenet, check if the code
 		 * sent back is good.
 		 *
