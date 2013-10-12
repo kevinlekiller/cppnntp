@@ -505,8 +505,8 @@ namespace nntp {
 				else
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
-				// Prints the buffer sent from usenet.
-				std::cout.write(buffer.data(), bytesRead);
+				// Prints the buffer sent from usenet without .CRLF
+				std::cout.write(buffer.data(), bytesRead-3);
 
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
