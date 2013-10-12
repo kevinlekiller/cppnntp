@@ -13,34 +13,6 @@ namespace nntp
 {
 	class nntp
 	{
-	private:
-		/**
-		 * Create a socket instance.
-		 *
-		 * @private
-		 */
-		socket sock;
-
-		/**
-		 * Are we allowed to post to the server?
-		 *
-		 * @note This is set when we connect to the server.
-		 * @private
-		 */
-		bool posting = false;
-
-		/**
-		 * Parse response from XOVER.
-		 *
-		 * @note This goes over the headers returned by usenet
-		 * when passing an XOVER command, it splits the headers
-		 * into readable text.
-		 * @private
-		 *
-		 * @param   finalbuffer = The buffer reference.
-		 */
-		void parseheaders(const std::string &finalbuffer);
-
 	public:
 		/**
 		 * Constructor.
@@ -127,6 +99,42 @@ namespace nntp
 		 * @return  bool = Did we get the group overview?
 		 */
 		bool group(const std::string &groupname);
+
+		/**
+		 * Return the total amount of articles for the selected group.
+		 *
+		 * @public
+		 *
+		 * @return The total amount of articles.
+		 */
+		long unsigned group_total();
+
+		/**
+		 * Return the oldest article number for the group.
+		 *
+		 * @public
+		 *
+		 * @return The oldest article.
+		 */
+		long unsigned group_oldest();
+
+		/**
+		 * Return the newest article number for the group.
+		 *
+		 * @public
+		 *
+		 * @return The newest article.
+		 */
+		long unsigned group_newest();
+
+		/**
+		 * Return the name of the selected group.
+		 *
+		 * @public
+		 *
+		 * @return The name of the group.
+		 */
+		std::string group_name();
 
 		/**
 		 * Send the LISTGROUP command 1 group.
@@ -289,5 +297,81 @@ namespace nntp
 		 * @return bool = Does the server recognize the command?
 		 */
 		bool xfeaturegzip();
+
+	private:
+		/**
+		 * Create a socket instance.
+		 *
+		 * @private
+		 */
+		socket sock;
+
+		/**
+		 * Are we allowed to post to the server?
+		 *
+		 * @note This is set when we connect to the server.
+		 * @private
+		 */
+		bool posting = false;
+
+		/**
+		 * Parse response from XOVER.
+		 *
+		 * @note This goes over the headers returned by usenet
+		 * when passing an XOVER command, it splits the headers
+		 * into readable text.
+		 * @private
+		 *
+		 * @param   finalbuffer = The buffer reference.
+		 */
+		void parseheaders(const std::string &finalbuffer);
+
+		/**
+		 * Parse response from GROUP command.
+		 * 
+		 * @note This takes the response from a GROUP command and
+		 * stores the results as objects.
+		 * @private
+		 * 
+		 * @param   finalbuffer = The buffer reference.
+		 */
+		void parsegroup(const std::string &finalbuffer);
+
+		/* Group objects for the currently selected group follow.
+		 */
+		/**
+		 * Did we select a group?
+		 *
+		 * @private
+		 */
+		bool groupselected = false;
+
+		/**
+		 * Total amount of articles in the currently selected group.
+		 *
+		 * @private
+		 */
+		unsigned long grouptotal;
+
+		/**
+		 * Oldest article number in the currently selected group.
+		 * 
+		 * @private
+		 */
+		unsigned long groupoldest;
+
+		/**
+		 * Newest article number in the currently selected group.
+		 *
+		 * @private
+		 */
+		unsigned long groupnewest;
+
+		/**
+		 * Name of the currently selected group.
+		 *
+		 * @private
+		 */
+		std::string groupname;
 	};
 }

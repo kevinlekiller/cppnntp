@@ -145,6 +145,21 @@ namespace nntp
 		bool read_line(const responsecodes &response);
 
 		/**
+		 * Read the line sent back from usenet, check if the code
+		 * sent back is good.
+		 *
+		 * @note   This is for commands where usenet returns 1 line and
+		 * if you require the buffer.
+		 * @private
+		 *
+		 * @param  response = The expected response from the NNTP server
+		 *                    for the passed command.
+		 * @param  finalbuffer = Pass a string reference to store the buffer.
+		 * @return     bool = Did we succeed?
+		 */
+		bool read_line(const responsecodes &response, std::string &finalbuffer);
+
+		/**
 		 * Read lines sent back from usenet until we find a period on
 		 * the 3rd to last char of the buffer. Then verify the
 		 * expected response code.

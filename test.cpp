@@ -101,6 +101,8 @@ int testusenet1(std::string &hostname, std::string &port,
 				std::string &ssl, std::string &body,
 				std::string &messageid, std::string &path) {
 
+	std::cout << "Start of first set of examples.\n";
+
 	// Create instance of class nntp.
 	nntp::nntp nntp;
 
@@ -108,6 +110,7 @@ int testusenet1(std::string &hostname, std::string &port,
 	if (ssl == "true")
 		encrypt = true;
 	// Connect to the usenet server.
+	std::cout << "\nExample of connect:\n";
 	if (nntp.connect(hostname, port, encrypt))
 		std::cout << "Succesfully connected to usenet.\n";
 	else {
@@ -118,6 +121,7 @@ int testusenet1(std::string &hostname, std::string &port,
 	/* This will log in to usenet using the supplied password
 	 * and username.
 	 */
+	std::cout << "\nExample of login:\n";
 	if (nntp.login(username, password))
 		std::cout << "Succesfully logged in to usenet.\n";
 	else {
@@ -128,6 +132,7 @@ int testusenet1(std::string &hostname, std::string &port,
 	/* Send the HELP command which displays a list of
 	 * all the legal commands your usenet provider accepts.
 	 */
+	std::cout << "\nExample of HELP command:\n";
 	if (nntp.help())
 		std::cout << "HELP messages succesfully retrieved.\n";
 	else {
@@ -138,12 +143,16 @@ int testusenet1(std::string &hostname, std::string &port,
 	/* Send the DATE command which displays the
 	 * local time of your usenet provider.
 	 */
+	std::cout << "\nExample DATE command:\n";
 	if (nntp.date())
 		std::cout << "Retrieved the date from the usenet server.\n";
 	else {
 		std::cerr << "Problem passing the DATE command.\n";
 		return 1;
 	}
+
+	std::cout << "\nEnd of first set of examples.\n";
+
 	 return 0;
 	/* Since we go out of scope, the desctructors of both
 	 * socket and nntp will handle closing the connection.
@@ -160,6 +169,8 @@ int testusenet2(std::string &hostname, std::string &port,
 				std::string &ssl, std::string &body,
 				std::string &messageid, std::string &path) {
 
+	std::cout << "\nStart of second set of examples.\n";
+
 	// Create instance of class nntp.
 	nntp::nntp nntp;
 
@@ -167,6 +178,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	if (ssl == "true")
 		encrypt = true;
 	// Connect to the usenet server.
+	std::cout << "\nExample of connect:\n";
 	if (nntp.connect(hostname, port, encrypt))
 		std::cout << "Succesfully connected to usenet.\n";
 	else {
@@ -177,6 +189,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	/* This will log in to usenet using the supplied password
 	 * and username.
 	 */
+	std::cout << "\nExample of login:\n";
 	if (nntp.login(username, password))
 		std::cout << "Succesfully logged in to usenet.\n";
 	else {
@@ -187,12 +200,21 @@ int testusenet2(std::string &hostname, std::string &port,
 	/* Send the GROUP command to select a group. This displays information
 	 * on the articles stored in the group.
 	 */
+	std::cout << "\nExample of GROUP command:\n";
 	if (nntp.group(group))
 		std::cout << "Succesfully passed the GROUP command.\n";
 	else {
 		std::cerr << "Problem selecting the GROUP.\n";
 		return 1;
 	}
+
+	/* Fetch some group details.
+	 */
+	std::cout << "\nExample of group objects:\n"
+	<< "Group name: " << nntp.group_name() << std::endl
+	<< "Group's newest article: " << nntp.group_newest()
+	<< "Group's oldest article: " << std::endl << nntp.group_oldest() << std::endl
+	<< "Total amount of articles for the group: " << nntp.group_total() << std::endl;
 
 	if (xover == "true") {
 		/* Send the XOVER command which displays an header with
@@ -202,6 +224,7 @@ int testusenet2(std::string &hostname, std::string &port,
 		 * future I will make an overloaded function with
 		 * the parsed header as an array.
 		 */
+		std::cout << "\nExample of XOVER command:\n";
 		if (nntp.xover(start, end))
 			std::cout << "Succesfully downloaded headers with XOVER command.\n";
 		else {
@@ -244,6 +267,7 @@ int testusenet2(std::string &hostname, std::string &port,
 		 * on the screen.
 		 */
 		std::string decodeddata;
+		std::cout << "\nExample of BODY command:\n";
 		if (nntp.body(messageid, decodeddata, path)) {
 			std::cout
 			<< "Succesfully downloaded an article body and stored it here: "
@@ -259,6 +283,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	 * unlike XOVER which only displays the more useful lines
 	 * of the article.
 	 */
+	std::cout << "\nExample of HEAD command:\n";
 	if (nntp.head(start))
 		std::cout << "Succesfully downloaded an article header with HEAD command.\n";
 	else {
@@ -269,6 +294,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	/* This is just an example to show we can keep the class instance
 	 * and disconnect from usenet, then reconnect at a later time.
 	 */
+	std::cout << "\nExample of disconnecting and reconnecting:\n";
 	nntp.disconnect();
 	if (nntp.connect(hostname, port, encrypt))
 		std::cout << "Connected to usenet.\n";
@@ -277,11 +303,12 @@ int testusenet2(std::string &hostname, std::string &port,
 		return 1;
 	}
 
+	std::cout << "\nEnd of second set of examples.\n";
 	return 0;
 	/* Again we go out of scope, the destructors take care of
 	 * the connection to usenet (so disconnect is not needed if you
 	 * go out of scope). However if you need require a connection,
-	 * then you do nothing with that connection for a long period of
+	 * and you do nothing with that connection for a long period of
 	 * time, it is a good idea to disconnect.
 	 */
 }

@@ -364,6 +364,67 @@ namespace nntp {
 	}
 
 	/**
+	 * Read the line sent back from usenet, check if the code
+	 * sent back is good.
+	 *
+	 * @note   This is for commands where usenet returns 1 line and
+	 * if you require the buffer.
+	 * @private
+	 *
+	 * @param  response = The expected response from the NNTP server
+	 *                    for the passed command.
+	 * @param  finalbuffer = Pass a string reference to store the buffer.
+	 * @return     bool = Did we succeed?
+	 */
+	bool socket::read_line(const responsecodes &response, std::string &finalbuffer) {
+		try {
+			bool done = false;
+			// Create a string to store the response.
+			std::string resp = "";
+			do {
+				// Create an array, max 1024 chars to store the buffer.
+				boost::array<char, 1024> buffer;
+				// Store the buffer into the array, get the size.
+				size_t bytesRead;
+				if (tcp_sock != NULL)
+					bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
+				else
+					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
+
+				// Prints the buffer sent from usenet.
+				std::cout.write(buffer.data(), bytesRead);
+
+				// Append the current buffer to the final buffer.
+				unsigned short iter = 0;
+				while (buffer[iter] != '\0') {
+					finalbuffer += buffer[iter];
+					if (iter++ == (bytesRead-1))
+						break;
+				}
+
+				// Get the 3 first chars of the array, the response.
+				if (resp == "") {
+					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+				}
+
+				// Check if the response is good (convert resp to int).
+				if (std::stoi(resp) == response)
+					done = true;
+				else {
+					std::cout << "NNTP error: ";
+					std::cout.write(buffer.data(), bytesRead);
+					std::cout << std::endl;
+					return false;
+				}
+			} while (!done);
+		} catch (boost::system::system_error& error) {
+			std::cerr << "NNTP error: " << error.what() << std::endl;
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Read lines sent back from usenet until we find a period on
 	 * the 3rd to last char of the buffer. Then verify the expected
 	 * response code.
@@ -379,8 +440,8 @@ namespace nntp {
 	 */
 	bool socket::read_lines(const responsecodes &response) {
 		// Check if gzip compression is on.
-		if (compression)
-			return read_compressed_lines(response);
+		//if (compression)
+			//return read_compressed_lines(response);
 
 		// Read until we find the period.
 		try {

@@ -143,10 +143,79 @@ namespace nntp {
 		if (!sock.send_command("GROUP " + groupname))
 			return false;
 
-		if (!sock.read_line(RESPONSECODE_GROUP_SELECTED))
+		std::string finalbuffer = "";
+		if (!sock.read_line(RESPONSECODE_GROUP_SELECTED, finalbuffer))
 			return false;
 
+		groupselected = true;
+		// Parse and store the data as objects.
+		parsegroup(finalbuffer);
+
 		return true;
+	}
+
+	/**
+	 * Return the total amount of articles for the selected group.
+	 *
+	 * @public
+	 *
+	 * @return The total amount of articles.
+	 */
+	long unsigned nntp::group_total() {
+		if (groupselected)
+			return grouptotal;
+		else {
+			std::cerr << "NNTP error: Group not selected.\n";
+			return 0;
+		}
+	}
+
+	/**
+	 * Return the oldest article number for the group.
+	 *
+	 * @public
+	 *
+	 * @return The oldest article.
+	 */
+	long unsigned nntp::group_oldest() {
+		if (groupselected)
+			return groupoldest;
+		else {
+			std::cerr << "NNTP error: Group not selected.\n";
+			return 0;
+		}
+	}
+
+	/**
+	 * Return the newest article number for the group.
+	 *
+	 * @public
+	 *
+	 * @return The newest article.
+	 */
+	long unsigned nntp::group_newest() {
+		if (groupselected)
+			return groupnewest;
+		else {
+			std::cerr << "NNTP error: Group not selected.\n";
+			return 0;
+		}
+	}
+
+	/**
+	 * Return the name of the selected group.
+	 *
+	 * @public
+	 *
+	 * @return The name of the group.
+	 */
+	std::string nntp::group_name() {
+		if (groupselected)
+			return groupname;
+		else {
+			std::cerr << "NNTP error: Group not selected.\n";
+			return "";
+		}
 	}
 
 	/**
@@ -165,7 +234,7 @@ namespace nntp {
 		if (!sock.send_command("LISTGROUP " + groupname))
 		return false;
 
-		if (!sock.read_line(RESPONSECODE_GROUP_SELECTED))
+		if (!sock.read_lines(RESPONSECODE_GROUP_SELECTED))
 			return false;
 
 		return true;
@@ -191,7 +260,7 @@ namespace nntp {
 		if (!sock.send_command("LISTGROUP " + groupname + " " + start + '-' + end))
 		return false;
 
-		if (!sock.read_line(RESPONSECODE_GROUP_SELECTED))
+		if (!sock.read_lines(RESPONSECODE_GROUP_SELECTED))
 			return false;
 
 		return true;
@@ -424,6 +493,49 @@ namespace nntp {
 		// Enable the compression flag in socket.
 		sock.compressionstatus(true);
 		return true;
+	}
+
+	/**
+	 * Parse response from GROUP command.
+	 * 
+	 * @note This takes the response from a GROUP command and
+	 * stores the results as objects.
+	 * @private
+	 * 
+	 * @param   finalbuffer = The buffer reference.
+	 */
+	void nntp::parsegroup(const std::string &finalbuffer) {
+		unsigned short line = 0;
+		std::string curline = "";
+		// Loop over every char in the buffer.
+		for (unsigned short i = 0; i < (finalbuffer.length() - 2); i++) {
+			// Skip spaces.
+			if (finalbuffer[i] == 32) {
+				switch (line++) {
+					// Skip the response code.
+					case 0:
+						break;
+					// Total amount of articles.
+					case 1:
+						grouptotal = std::stoi(curline);
+						break;
+					// Oldest article.
+					case 2:
+						groupoldest = std::stoi(curline);
+						break;
+					// Newest article.
+					case 3:
+						groupnewest = std::stoi(curline);
+						break;
+				}
+				curline = "";
+			}
+			else {
+				curline += finalbuffer[i];
+			}
+		}
+		// Name of the group.
+		groupname = curline;
 	}
 
 	/**
