@@ -128,9 +128,8 @@ namespace nntp {
 						boost::array<char, 1024> buffer;
 						size_t bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
 
-						if (resp == "") {
-							resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
-						}
+						if (resp == "")
+							resp = resp + buffer[0] + buffer[1] + buffer[2];
 
 						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED) {
 							posting = true;
@@ -233,9 +232,8 @@ namespace nntp {
 						boost::array<char, 1024> buffer;
 						size_t bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
-						if (resp == "") {
-							resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
-						}
+						if (resp == "")
+							resp = resp + buffer[0] + buffer[1] + buffer[2];
 
 						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED) {
 							posting = false;
@@ -345,7 +343,7 @@ namespace nntp {
 
 				// Get the 3 first chars of the array, the response.
 				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					code = std::stoi(resp);
 				}
 
@@ -396,9 +394,8 @@ namespace nntp {
 				std::cout.write(buffer.data(), bytesRead);
 
 				// Get the 3 first chars of the array, the response.
-				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
-				}
+				if (resp == "")
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 
 				// Check if the response is good (convert resp to int).
 				if (std::stoi(resp) == response)
@@ -457,9 +454,8 @@ namespace nntp {
 				}
 
 				// Get the 3 first chars of the array, the response.
-				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
-				}
+				if (resp == "")
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 
 				// Check if the response is good (convert resp to int).
 				if (std::stoi(resp) == response)
@@ -514,7 +510,7 @@ namespace nntp {
 
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response)
 						return false;
 				}
@@ -585,7 +581,7 @@ namespace nntp {
 
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response)
 						return false;
 				}
@@ -643,7 +639,7 @@ namespace nntp {
 
 				// Get the 3 first chars of the array, the response.
 				if (resp == "") {
-					resp += buffer[0]; resp += buffer[1]; resp += buffer[2];
+					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response)
 						return false;
 				}
@@ -718,8 +714,7 @@ namespace nntp {
 				boost::iostreams::copy(in, copyback);
 
 				// The response + the decompressed data + .CRLF
-				finalbuffer = respline + '\n'
-					+ copyback.str() + '.' + '\r' + '\n';
+				finalbuffer = respline + '\n' + copyback.str() + '.' + '\r' + '\n';
 
 				return true;
 			 } catch (boost::iostreams::zlib_error& e) {
