@@ -21,7 +21,9 @@ and examples on what most of the things do.
 
 Zlib is required for XFEATURE GZIP COMPRESS.
 
-(Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54).
+Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54, also
+compiles fine on boost 1.53.
+
 g++ test.cpp nntp.cpp boostRegexExceptions.cpp socket.cpp yencdecode.cpp -o "test" -lboost_system -lpthread -lboost_regex -std=c++11 -lboost_thread -lssl -lcrypto -lz -lboost_iostreams
 
 

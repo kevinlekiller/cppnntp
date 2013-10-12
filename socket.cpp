@@ -628,7 +628,6 @@ namespace nntp {
 			std::string resp = "";
 			do {
 				// Create an array, max 1024 chars to store the buffer.
-				//boost::array<char, 1024> buffer;
 				char buffer[1024];
 				// Store the buffer into the array, get the size.
 				size_t bytesRead;

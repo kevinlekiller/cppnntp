@@ -215,7 +215,7 @@ namespace nntp
 		/**
 		 * Read lines sent back from usenet used when using gzip compress.
 		 *
-		 * @note Not started working on this yet.
+		 * @note For multi line commands that can be compressed (XOVER).
 		 * @private
 		 *
 		 * @param  response = The expected response from the NNTP server
