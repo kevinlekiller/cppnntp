@@ -1,5 +1,5 @@
 #include "yencdecode.hpp"
-namespace nntp {
+namespace cppnntplib {
 	/**
 	 * Constructor.
 	 *

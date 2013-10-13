@@ -1,6 +1,6 @@
 #include "nntp.hpp"
 
-namespace nntp {
+namespace cppnntplib {
 	/**
 	 * Constructor.
 	 *
@@ -54,10 +54,15 @@ namespace nntp {
 	 * @public
 	 */
 	void nntp::disconnect() {
+		// Tell usenet we want to disconnect.
 		if (sock.is_connected()) {
 			sock.send_command("QUIT");
 			sock.read_line(RESPONSECODE_DISCONNECTING_REQUESTED);
 		}
+		// Set groupselected back to false.
+		groupselected = false;
+		// Set compression flag in socket to false.
+		sock.togglecompression(false);
 		sock.close();
 	}
 
@@ -94,7 +99,8 @@ namespace nntp {
 	 * Send the HELP command.
 	 *
 	 * @note This sends the HELP command to usenet and displays
-	 * the response on the command line.
+	 * the response on the command line. This displays the list
+	 * of available commands on the server.
 	 * @public
 	 *
 	 * @return bool = Did we retrieve the help messages?
@@ -110,10 +116,30 @@ namespace nntp {
 	}
 
 	/**
+	 * Send the CAPABILITIES command.
+	 *
+	 * @note This sends the CAPABILITIES command to usenet and
+	 * displays the response on the command line. This is a
+	 * list of capabilities on the server.
+	 * @public
+	 *
+	 * @return bool = Did we retrieve the capabilities list?
+	 */
+	bool nntp::capabilities() {
+		if (!sock.send_command("CAPABILITIES"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_CAPABILITIES_FOLLOW))
+			return false;
+
+		return true;
+	}
+
+	/**
 	 * Send the DATE command.
 	 *
-	 * @note This sends the DATE command and displays the usenet
-	 * server's local date on the command line.
+	 * @note This sends the DATE command the server returns the
+	 * current UTC time.
 	 * @public
 	 *
 	 * @return bool = Did we get the date from the NNTP server?
@@ -232,7 +258,40 @@ namespace nntp {
 	 */
 	bool nntp::listgroup(const std::string &groupname) {
 		if (!sock.send_command("LISTGROUP " + groupname))
-		return false;
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_GROUP_SELECTED))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send the LISTGROUP command 1 group with an article and a direction.
+	 *
+	 * @note This passes the LISTGROUP command for a single group
+	 * to usenet and displays the overview information
+	 * and a list of all the article numbers for that group
+	 * on the command line newer or older than the supplied
+	 * article number or message-id.
+	 * @public
+	 *
+	 * @param     group = The name of the group.
+	 * @param   anumber = The article number or message-id.
+	 * @param direction = True: Articles newer than anumber, False:
+	 * articles older than anumber.
+	 * @return bool = Did we get the group info?
+	 */
+	bool nntp::listgroup(const std::string &groupname,
+				const std::string &anumber, const bool &direction) {
+		if (direction) {
+			if (!sock.send_command("LISTGROUP " + groupname + " " + anumber + '-'))
+				return false;
+		}
+		else {
+			if (!sock.send_command("LISTGROUP " + groupname + " -" + anumber))
+				return false;
+		}
 
 		if (!sock.read_lines(RESPONSECODE_GROUP_SELECTED))
 			return false;
@@ -258,9 +317,126 @@ namespace nntp {
 	bool nntp::listgroup(const std::string &groupname, const std::string &start,
 					const std::string &end) {
 		if (!sock.send_command("LISTGROUP " + groupname + " " + start + '-' + end))
-		return false;
+			return false;
 
 		if (!sock.read_lines(RESPONSECODE_GROUP_SELECTED))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST ACTIVE command which displays a list of all
+	 * groups with their article numbers and if we can post
+	 * in them or not.
+	 * 
+	 * @public
+	 * 
+	 * @return bool = Did we get the list of groups?
+	 */
+	bool nntp::listactive() {
+		if (!sock.send_command("LIST ACTIVE"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST ACTIVE command which displays a list of groups
+	 * matching the wildmat (search query), with first and last
+	 * article numbers, and if we can post in them or not.
+	 * 
+	 * @public
+	 * 
+	 * @param wildmat = (See RFC3977 for detailed info) Allows you
+	 * to search for groups (example: binaries*,*linux)
+	 * @return   bool = Did we get the list of groups?
+	 */
+	bool nntp::listactive(const std::string &wildmat) {
+		if (!sock.send_command("LIST ACTIVE " + wildmat))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST ACTIVE.TIMES command which displays a list of all
+	 * groups with their created time and creator.
+	 * 
+	 * @public
+	 * 
+	 * @return bool = Did we get the list of groups?
+	 */
+	bool nntp::listactivetimes() {
+		if (!sock.send_command("LIST ACTIVE.TIMES"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST ACTIVE.TIMES command which displays a list of groups
+	 * matching the wildmat (search query), with their created time
+	 * and creator.
+	 * 
+	 * @public
+	 * 
+	 * @param wildmat = (See RFC3977 for detailed info) Allows you
+	 * to search for groups (example: binaries*,*linux)
+	 * @return   bool = Did we get the list of groups?
+	 */
+	bool nntp::listactivetimes(const std::string &wildmat) {
+		if (!sock.send_command("LIST ACTIVE.TIMES " + wildmat))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST NEWSGROUPS command which displays a list of all
+	 * groups with their descriptions.
+	 * 
+	 * @public
+	 * 
+	 * @return bool = Did we get the list of groups?
+	 */
+	bool nntp::listnewsgroups() {
+		if (!sock.send_command("LIST NEWSGROUPS"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LIST NEWSGROUPS command which displays a list of groups
+	 * matching the wildmat (search query), with their descriptions.
+	 * 
+	 * @public
+	 * 
+	 * @param wildmat = (See RFC3977 for detailed info) Allows you
+	 * to search for groups (example: binaries*,*linux)
+	 * @return   bool = Did we get the list of groups?
+	 */
+	bool nntp::listnewsgroups(const std::string &wildmat) {
+		if (!sock.send_command("LIST NEWSGROUPS " + wildmat))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE))
 			return false;
 
 		return true;
@@ -281,6 +457,50 @@ namespace nntp {
 	 */
 	bool nntp::stat(const std::string &anumber) {
 		if (!sock.send_command("STAT " + anumber))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_ARTICLE_SELECTED))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send LAST command.
+	 * 
+	 * @note This passes the LAST command to the NNTP server,
+	 * you must pass the GROUP command first, and a NEXT or STAT
+	 * command after that. It will display the previous article
+	 * before the NEXT or STAT commands (as long as there is a 
+	 * previous article in that group).
+	 * @public
+	 * 
+	 * @return bool = Did we receive the article?
+	 */
+	bool nntp::last() {
+		if (!sock.send_command("LAST"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_ARTICLE_SELECTED))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send NEXT command.
+	 * 
+	 * @note This passes the NEXT command to the NNTP server,
+	 * you must pass the GROUP command first, if the group has
+	 * more then 1 article it will select the second article,
+	 * you can also use this after a STAT or LAST command (as long
+	 * as there is a next article in the group).
+	 * @public
+	 * 
+	 * @return bool = Did we receive the article?
+	 */
+	bool nntp::next() {
+		if (!sock.send_command("NEXT"))
 			return false;
 
 		if (!sock.read_lines(RESPONSECODE_ARTICLE_SELECTED))
@@ -460,7 +680,7 @@ namespace nntp {
 		if (direction)
 			cmd = "XOVER " + anumber + '-';
 		else
-			cmd = "XOVER " + '-' + anumber;
+			cmd = "XOVER -" + anumber;
 
 		if (!sock.send_command(cmd))
 			return false;

@@ -9,7 +9,7 @@
 #include "socket.hpp"
 #include "yencdecode.hpp"
 
-namespace nntp
+namespace cppnntplib
 {
 	class nntp
 	{
@@ -69,7 +69,8 @@ namespace nntp
 		 * Send the HELP command.
 		 *
 		 * @note This sends the HELP command to usenet and displays
-		 * the response on the command line.
+		 * the response on the command line. This displays the list
+		 * of available commands on the server.
 		 * @public
 		 *
 		 * @return bool = Did we retrieve the help messages?
@@ -77,10 +78,22 @@ namespace nntp
 		bool help();
 
 		/**
+		 * Send the CAPABILITIES command.
+		 *
+		 * @note This sends the CAPABILITIES command to usenet and
+		 * displays the response on the command line. This is a
+		 * list of capabilities on the server.
+		 * @public
+		 *
+		 * @return bool = Did we retrieve the capabilities list?
+		 */
+		bool capabilities();
+
+		/**
 		 * Send the DATE command.
 		 *
-		 * @note This sends the DATE command and displays the usenet
-		 * server's local date on the command line.
+		 * @note This sends the DATE command the server returns the
+		 * current UTC time.
 		 * @public
 		 *
 		 * @return bool = Did we get the date from the NNTP server?
@@ -151,6 +164,25 @@ namespace nntp
 		bool listgroup(const std::string &groupname);
 
 		/**
+		 * Send the LISTGROUP command 1 group.
+		 *
+		 * @note This passes the LISTGROUP command for a single group
+		 * to usenet and displays the overview information
+		 * and a list of all the article numbers for that group
+		 * on the command line newer or older than the supplied
+		 * article number or message-id.
+		 * @public
+		 *
+		 * @param     group = The name of the group.
+		 * @param   anumber = The article number or message-id.
+		 * @param direction = True: Articles newer than anumber, False:
+		 * articles older than anumber.
+		 * @return bool = Did we get the group info?
+		 */
+		bool listgroup(const std::string &groupname,
+					const std::string &anumber, const bool &direction);
+
+		/**
 		 * Send LISTGROUP command for 1 group with a range of
 		 * article numbers.
 		 *
@@ -169,6 +201,75 @@ namespace nntp
 						const std::string &end);
 
 		/**
+		 * Send LIST ACTIVE command which displays a list of all
+		 * groups with their article numbers and if we can post
+		 * in them or not.
+		 * 
+		 * @public
+		 * 
+		 * @return bool = Did we get the list of groups?
+		 */
+		bool listactive();
+
+		/**
+		 * Send LIST ACTIVE command which displays a list of groups
+		 * matching the wildmat (search query), with first and last
+		 * article numbers, and if we can post in them or not.
+		 * 
+		 * @public
+		 * 
+		 * @param wildmat = (See RFC3977 for detailed info) Allows you
+		 * to search for groups (example: binaries*,*linux)
+		 * @return   bool = Did we get the list of groups?
+		 */
+		bool listactive(const std::string &wildmat);
+
+		/**
+		 * Send LIST ACTIVE.TIMES command which displays a list of all
+		 * groups with their created time and creator.
+		 * 
+		 * @public
+		 * 
+		 * @return bool = Did we get the list of groups?
+		 */
+		bool listactivetimes();
+
+		/**
+		 * Send LIST ACTIVE.TIMES command which displays a list of groups
+		 * matching the wildmat (search query), with their created time
+		 * and creator.
+		 * 
+		 * @public
+		 * 
+		 * @param wildmat = (See RFC3977 for detailed info) Allows you
+		 * to search for groups (example: binaries*,*linux)
+		 * @return   bool = Did we get the list of groups?
+		 */
+		bool listactivetimes(const std::string &wildmat);
+
+		/**
+		 * Send LIST NEWSGROUPS command which displays a list of all
+		 * groups with their descriptions.
+		 * 
+		 * @public
+		 * 
+		 * @return bool = Did we get the list of groups?
+		 */
+		bool listnewsgroups();
+
+		/**
+		 * Send LIST NEWSGROUPS command which displays a list of groups
+		 * matching the wildmat (search query), with their descriptions.
+		 * 
+		 * @public
+		 * 
+		 * @param wildmat = (See RFC3977 for detailed info) Allows you
+		 * to search for groups (example: binaries*,*linux)
+		 * @return   bool = Did we get the list of groups?
+		 */
+		bool listnewsgroups(const std::string &wildmat);
+
+		/**
 		 * Send STAT command for 1 article number or message-id.
 		 *
 		 * @note This passes the STAT command for 1 article number
@@ -182,6 +283,34 @@ namespace nntp
 		 *                   a problem sending the command?
 		 */
 		bool stat(const std::string &anumber);
+
+		/**
+		 * Send LAST command.
+		 * 
+		 * @note This passes the LAST command to the NNTP server,
+		 * you must pass the GROUP command first, and a NEXT or STAT
+		 * command after that. It will display the previous article
+		 * before the NEXT or STAT commands (as long as there is a 
+		 * previous article in that group).
+		 * @public
+		 * 
+		 * @return bool = Did we receive the article?
+		 */
+		bool last();
+
+		/**
+		 * Send NEXT command.
+		 * 
+		 * @note This passes the NEXT command to the NNTP server,
+		 * you must pass the GROUP command first, if the group has
+		 * more then 1 article it will select the second article,
+		 * you can also use this after a STAT or LAST command (as long
+		 * as there is a next article in the group).
+		 * @public
+		 * 
+		 * @return bool = Did we receive the article?
+		 */
+		bool next();
 
 		/**
 		 * Send ARTICLE command for 1 article number or message-id.

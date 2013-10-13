@@ -1,4 +1,4 @@
-namespace nntp
+namespace cppnntplib
 {
 	/**
 	 * Response codes from usenet.

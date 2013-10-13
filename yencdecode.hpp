@@ -2,7 +2,7 @@
 #include "boostRegexExceptions.hpp"
 #include <iostream>
 
-namespace nntp
+namespace cppnntplib
 {
 	class yencdecode
 	{

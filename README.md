@@ -37,47 +37,55 @@ AUTHINFO      (login)
 
 ARTICLE       (only outputs to CLI, use body if you need the message)
 
-BODY          
+BODY          (fetches the message of the article)
 
-DATE          (need to parse this with BOOST)
+CAPABILITIES  (list of supported capabilities)
 
-GROUP         
+DATE          (UTC time of the server, used with NEWNEWS and NEWGROUPS)
 
-HEAD          
+GROUP         (tells the server to use a specified group)
 
-HELP          
+HEAD          (single header for a message-id or art #)
 
-LISTGROUP     (need to do more testing on this)
+HELP          (list of supported commands)
 
-POST          
+LAST          (previous article, use after ARTICLE/STAT/NEXT)
 
-STAT          (not tested yet)
+LIST ACTIVE   (list all groups with their article numbers and post status, optional search wildmat)
 
-XFEATURE GZIP COMPRESS
+LIST ACTIVE.TIMES (list all groups with their creators and create time, optional search wildmat)
+
+LIST NEWSGROUPS (displays list of all groups with descriptions, optional search wildmat)
+
+LISTGROUP     (displays all the article numbers in the group or within a range or higher or lower)
+
+NEXT          (next article)
+
+POST          (upload an article to usenet)
+
+STAT          (asks if the article exists)
+
+XFEATURE GZIP COMPRESS (compression for XOVER/OVER headers)
 
 XOVER         (need to store the headers in an array)
 
 
 Not implemented:
 
-CAPABILITIES  
+IHAVE         (used with the MODE READER command)
 
-IHAVE         
+MODE READER   (used for the IHAVE command)
 
-LAST          
+LIST DISTRIB.PATS
 
-LIST          
+LIST OVERVIEW.FMT (overview format for OVER/XOVER)
 
-MODE READER   (not needed?)
+NEWGROUPS     (new groups since yyyymmdd hhmmss GMT)
 
-NEWGROUPS     
+NEWNEWS       (list of message-id's since yyyymmdd hhmmss GMT for the selected group)        
 
-NEWNEWS       
+OVER          (RFC3977 2006, none of my NNTP providers have this, it's the same as RFC2980 2000's XOVER which all my providers have)
 
-NEXT          
+HDR/XHDR      (RFC3977 = HDR, none of my servers have HDR, this command displays the article number + the subect)
 
-OVER          (RFC3977 2006, none of my NNTP providers have this, it's
-the same as RFC2980 2000's XOVER which all my providers have)
-
-XHDR          (RFC3977 = HDR, none of my servers have HDR, this command
-seems to only display the article number + the subect)
+LIST HEADERS  (used to set the fields displayed by HDR/XHDR so it can display more than just subject + anumber)

@@ -1,5 +1,5 @@
 #include "socket.hpp"
-namespace nntp {
+namespace cppnntplib {
 	/**
 	 * Constructor.
 	 *

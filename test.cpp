@@ -114,7 +114,7 @@ int testusenet1(std::string &hostname, std::string &port,
 	std::cout << "Start of first set of examples.\n";
 
 	// Create instance of class nntp.
-	nntp::nntp nntp;
+	cppnntplib::nntp nntp;
 
 	bool encrypt = false;
 	if (ssl == "true")
@@ -226,7 +226,7 @@ int testusenet2(std::string &hostname, std::string &port,
 	std::cout << "\nStart of second set of examples.\n";
 
 	// Create instance of class nntp.
-	nntp::nntp nntp;
+	cppnntplib::nntp nntp;
 
 	bool encrypt = false;
 	if (ssl == "true")
