@@ -624,6 +624,12 @@ namespace cppnntplib {
 		return parsecompressedbuffer(finalbuffer);
 	}
 
+
+	/**
+	 * Decompress gzip buffer.
+	 * 
+	 * @public
+	 */
 	bool socket::parsecompressedbuffer(std::string &finalbuffer) {
 		bool respfound = false;
 		std::string newbuffer, respline = "";
@@ -652,36 +658,30 @@ namespace cppnntplib {
 		if (newbuffer[0] != 120)
 			return false;
 
-		// Check if the 2nd char is representative of a gzip header start.
-		if (newbuffer[1] == 1 || newbuffer[1] == 94
-			|| newbuffer[1] == 156 || newbuffer[1] == 218) {
+		// Try to decompress the data, catch zlib errors.
+		try {
 
-			// Try to decompress the data, catch zlib errors.
-			try {
+			// Create a string stream to store the gzip data.
+			std::stringstream ss(newbuffer);
+			// Create a string stream to store the decompressed data.
+			std::stringstream copyback;
 
-				// Create a string stream to store the gzip data.
-				std::stringstream ss(newbuffer);
-				// Create a string stream to store the decompressed data.
-				std::stringstream copyback;
+			// Create a decompress object.
+			boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+			// Tell it to use zlib.
+			in.push(boost::iostreams::zlib_decompressor());
+			// Decompress the data.
+			in.push(ss);
+			// Copy the data.
+			boost::iostreams::copy(in, copyback);
 
-				// Create a decompress object.
-				boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-				// Tell it to use zlib.
-				in.push(boost::iostreams::zlib_decompressor());
-				// Decompress the data.
-				in.push(ss);
-				// Copy the data.
-				boost::iostreams::copy(in, copyback);
+			// The response + the decompressed data + .CRLF
+			finalbuffer = respline + '\n' + copyback.str() + '.' + '\r' + '\n';
 
-				// The response + the decompressed data + .CRLF
-				finalbuffer = respline + '\n' + copyback.str() + '.' + '\r' + '\n';
-
-				return true;
-			 } catch (boost::iostreams::zlib_error& e) {
-				std::cerr << e.what() << std::endl;
-				return false;
-			}
+			return true;
+		 } catch (boost::iostreams::zlib_error& e) {
+			std::cerr << e.what() << std::endl;
+			return false;
 		}
-		return false;
 	}
 }

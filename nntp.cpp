@@ -843,9 +843,8 @@ namespace cppnntplib {
 
 		std::string CRLF = "\r\n";
 
-		unsigned long mlth = message.length();
 		// Check if message ends in CRLF.
-		if (message[(mlth - 2)] != '\r' && message[(mlth - 1)] != '\n')
+		if (message[(message.length() - 2)] != '\r' && message[(message.length() - 1)] != '\n')
 			message += CRLF;
 
 		// Try to send the article.
