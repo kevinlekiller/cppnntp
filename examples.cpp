@@ -1,8 +1,8 @@
 #include <fstream>
 #include <boost/regex.hpp>
 #include <boost/thread.hpp>
-#include "boostRegexExceptions.hpp"
-#include "nntp.hpp"
+#include "cppnntplib/boostRegexExceptions.hpp"
+#include "cppnntplib/nntp.hpp"
 
 // Fetch the config options from the config file.
 bool readconf(std::string &hostname, std::string &port,
