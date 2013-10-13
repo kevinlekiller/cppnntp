@@ -443,6 +443,48 @@ namespace cppnntplib {
 	}
 
 	/**
+	 * Send NEWGROUPS command which displays a list of groups
+	 * since the specified UTC(GMT) time.
+	 * 
+	 * @public
+	 * @example       newgroups("20131013", "143200");
+	 * 
+	 * @param  date = The date in this format: yyyymmdd
+	 * @param  time = The time in this format: hhmmss
+	 * @return bool = Did we get the list of groups?
+	 */
+	bool nntp::newgroups(const std::string &date, const std::string &time) {
+		if (!sock.send_command("NEWGROUPS " + date + " " + time + " GMT"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_NEW_GROUPS_FOLLOW))
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Send NEWNEWS command which displays of message-id's for
+	 * the selected group since the specified UTC(GMT) time.
+	 * 
+	 * @public
+	 * @example       newnews("20131013", "143200");
+	 * 
+	 * @param  date = The date in this format: yyyymmdd
+	 * @param  time = The time in this format: hhmmss
+	 * @return bool = Did we get the list of message-ids?
+	 */
+	bool nntp::newnews(const std::string &date, const std::string &time) {
+		if (!sock.send_command("NEWNEWS " + date + " " + time + " GMT"))
+			return false;
+
+		if (!sock.read_lines(RESPONSECODE_NEW_ARTICLES_FOLLOW))
+			return false;
+
+		return true;
+	}
+
+	/**
 	 * Send STAT command for 1 article number or message-id.
 	 *
 	 * @note This passes the STAT command for 1 article number

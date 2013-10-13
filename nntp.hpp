@@ -270,6 +270,32 @@ namespace cppnntplib
 		bool listnewsgroups(const std::string &wildmat);
 
 		/**
+		 * Send NEWGROUPS command which displays a list of groups
+		 * since the specified UTC(GMT) time.
+		 * 
+		 * @public
+		 * @example       newgroups("20131013", "143200");
+		 * 
+		 * @param  date = The date in this format: yyyymmdd
+		 * @param  time = The time in this format: hhmmss
+		 * @return bool = Did we get the list of groups?
+		 */
+		bool newgroups(const std::string &date, const std::string &time);
+
+		/**
+		 * Send NEWNEWS command which displays of message-id's for
+		 * the selected group since the specified UTC(GMT) time.
+		 * 
+		 * @public
+		 * @example       newnews("20131013", "143200");
+		 * 
+		 * @param  date = The date in this format: yyyymmdd
+		 * @param  time = The time in this format: hhmmss
+		 * @return bool = Did we get the list of message-ids?
+		 */
+		bool newnews(const std::string &date, const std::string &time);
+
+		/**
 		 * Send STAT command for 1 article number or message-id.
 		 *
 		 * @note This passes the STAT command for 1 article number

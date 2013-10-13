@@ -61,6 +61,10 @@ LISTGROUP     (displays all the article numbers in the group or within a range o
 
 NEXT          (next article)
 
+NEWGROUPS     (new groups since yyyymmdd hhmmss GMT)
+
+NEWNEWS       (list of message-id's since yyyymmdd hhmmss GMT for the selected group)      
+
 POST          (upload an article to usenet)
 
 STAT          (asks if the article exists)
@@ -78,11 +82,7 @@ MODE READER   (used for the IHAVE command)
 
 LIST DISTRIB.PATS
 
-LIST OVERVIEW.FMT (overview format for OVER/XOVER)
-
-NEWGROUPS     (new groups since yyyymmdd hhmmss GMT)
-
-NEWNEWS       (list of message-id's since yyyymmdd hhmmss GMT for the selected group)        
+LIST OVERVIEW.FMT (overview format for OVER/XOVER)  
 
 OVER          (RFC3977 2006, none of my NNTP providers have this, it's the same as RFC2980 2000's XOVER which all my providers have)
 
