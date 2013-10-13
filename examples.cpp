@@ -4,104 +4,61 @@
 #include "boostRegexExceptions.hpp"
 #include "nntp.hpp"
 
-/**
- * Fetch the config options from the config file.
- */
+// Fetch the config options from the config file.
 bool readconf(std::string &hostname, std::string &port,
-				std::string &username, std::string &password,
-				std::string &group, std::string &xover,
-				std::string &start, std::string &end,
-				std::string &ssl, std::string &body,
-				std::string &messageid, std::string &path,
-				std::string &posting, std::string &head,
-				std::string &xfeature) {
+std::string &username, std::string &password, std::string &group,
+std::string &xover, std::string &start, std::string &end,
+std::string &ssl, std::string &body, std::string &messageid,
+std::string &path, std::string &posting, std::string &head,
+std::string &xfeature);
 
-	// Create a string to hold the file.
-	std::string line;
+// Show some examples of using the library.
+int testusenet1(std::string &hostname, std::string &port,
+std::string &username, std::string &password, std::string &group,
+std::string &xover, std::string &start, std::string &end,
+std::string &ssl, std::string &body, std::string &messageid,
+std::string &path, std::string &posting, std::string &head,
+std::string &xfeature);
 
-	// Create a file object to store the file contents.
-	std::ifstream file;
+// Show some more examples of using the library.
+int testusenet2(std::string &hostname, std::string &port,
+std::string &username, std::string &password, std::string &group,
+std::string &xover, std::string &start, std::string &end,
+std::string &ssl, std::string &body, std::string &messageid,
+std::string &path, std::string &posting, std::string &head,
+std::string &xfeature);
 
-	// Open the file.
-	file.open("config.cfg");
+// Get the config options and run the examples.
+int main() {
 
-	// Check if the file is open.
-	if (!file.is_open())
-		return false;
+	// Create strings to store the settings in.
+	std::string hostname,port,username,password,group,xfeature,
+		xover,start,end,ssl,body,messageid,path,posting,head;
 
-	// Loop through the file line by line until we get to the end.
-	while(!file.eof()) {
-
-		// Store the file's line into the string called line.
-		std::getline(file, line);
-
-		// Catch regex exceptions.
-		try {
-
-			// Create a regex array to store the found matches.
-			boost::smatch match;
-
-			// Create a regex to find the options and settings.
-			boost::regex pattern
-				("^(.+?)[[:space:]]*=[[:space:]]*(.*?)[[:space:]]*$",
-				boost::regex_constants::icase);
-
-			// Store the found settings according to the option.
-			if (boost::regex_search (line, match, pattern)) {
-				if (match[1] == "NNTP_SERVER")
-					hostname = match[2];
-				else if (match[1] == "NNTP_PORT")
-					port = match[2];
-				else if (match[1] == "NNTP_USERNAME")
-					username = match[2];
-				else if (match[1] == "NNTP_PASSWORD")
-					password = match[2];
-				else if (match[1] == "NNTP_SSL")
-					ssl = match[2];
-				else if (match[1] == "GROUP")
-					group = match[2];
-				else if (match[1] == "XOVER")
-					xover = match[2];
-				else if (match[1] == "START_HEADER")
-					start = match[2];
-				else if (match[1] == "END_HEADER")
-					end = match[2];
-				else if (match[1] == "BODY")
-					body = match[2];
-				else if (match[1] == "MESSAGE_ID")
-					messageid = match[2];
-				else if (match[1] == "PATH")
-					path = match[2];
-				else if (match[1] == "POSTING")
-					posting = match[2];
-				else if (match[1] == "HEAD")
-					head = match[2];
-				else if (match[1] == "XFEATURE_GZIP")
-					xfeature = match[2];
-			}
-		} catch (boost::regex_error& e) {
-			boostRegexExceptions(e);
-		}
-
-		// Reset the line.
-		line = "";
+	// Read the config file and store the settings in the strings.
+	if (!readconf(hostname, port, username, password, group, xover,
+		start, end, ssl, body, messageid, path, posting, head, xfeature)) {
+		std::cerr << "Error getting options from config.cfg\n";
+		return 1;
 	}
 
-	// Close the file.
-	file.close();
+	// Run the first set of tests.
+	if (testusenet1(hostname, port, username, password, group, xover,
+			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
+		return 1;
 
-	// Check if any of the required options were empty.
-	if (username  == "" || password == "" || hostname == ""
-		|| port == "" || group == "" || ssl == ""
-		|| path == "" || xover == "")
-		return false;
-	else
-		return true;
+	// Sleep for 2 seconds.
+	auto seconds(boost::posix_time::milliseconds(2000));
+	boost::this_thread::sleep(seconds);
+
+	// Run the second set of tests.
+	if (testusenet2(hostname, port, username, password, group, xover,
+			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
+		return 1;
+
+	return 0;
 }
 
-/**
- * Show some examples of using the library.
- */
 int testusenet1(std::string &hostname, std::string &port,
 				std::string &username, std::string &password,
 				std::string &group, std::string &xover,
@@ -211,9 +168,6 @@ int testusenet1(std::string &hostname, std::string &port,
 	 */
 }
 
-/**
- * Show some more examples of using the library.
- */
 int testusenet2(std::string &hostname, std::string &port,
 				std::string &username, std::string &password,
 				std::string &group, std::string &xover,
@@ -366,32 +320,94 @@ int testusenet2(std::string &hostname, std::string &port,
 	 */
 }
 
-int main() {
+bool readconf(std::string &hostname, std::string &port,
+				std::string &username, std::string &password,
+				std::string &group, std::string &xover,
+				std::string &start, std::string &end,
+				std::string &ssl, std::string &body,
+				std::string &messageid, std::string &path,
+				std::string &posting, std::string &head,
+				std::string &xfeature) {
 
-	// Create strings to store the settings in.
-	std::string hostname,port,username,password,group,xfeature,
-		xover,start,end,ssl,body,messageid,path,posting,head;
+	// Create a string to hold the file.
+	std::string line;
 
-	// Read the config file and store the settings in the strings.
-	if (!readconf(hostname, port, username, password, group, xover,
-		start, end, ssl, body, messageid, path, posting, head, xfeature)) {
-		std::cerr << "Error getting options from config.cfg\n";
-		return 1;
+	// Create a file object to store the file contents.
+	std::ifstream file;
+
+	// Open the file.
+	file.open("config.cfg");
+
+	// Check if the file is open.
+	if (!file.is_open())
+		return false;
+
+	// Loop through the file line by line until we get to the end.
+	while(!file.eof()) {
+
+		// Store the file's line into the string called line.
+		std::getline(file, line);
+
+		// Catch regex exceptions.
+		try {
+
+			// Create a regex array to store the found matches.
+			boost::smatch match;
+
+			// Create a regex to find the options and settings.
+			boost::regex pattern
+				("^(.+?)[[:space:]]*=[[:space:]]*(.*?)[[:space:]]*$",
+				boost::regex_constants::icase);
+
+			// Store the found settings according to the option.
+			if (boost::regex_search (line, match, pattern)) {
+				if (match[1] == "NNTP_SERVER")
+					hostname = match[2];
+				else if (match[1] == "NNTP_PORT")
+					port = match[2];
+				else if (match[1] == "NNTP_USERNAME")
+					username = match[2];
+				else if (match[1] == "NNTP_PASSWORD")
+					password = match[2];
+				else if (match[1] == "NNTP_SSL")
+					ssl = match[2];
+				else if (match[1] == "GROUP")
+					group = match[2];
+				else if (match[1] == "XOVER")
+					xover = match[2];
+				else if (match[1] == "START_HEADER")
+					start = match[2];
+				else if (match[1] == "END_HEADER")
+					end = match[2];
+				else if (match[1] == "BODY")
+					body = match[2];
+				else if (match[1] == "MESSAGE_ID")
+					messageid = match[2];
+				else if (match[1] == "PATH")
+					path = match[2];
+				else if (match[1] == "POSTING")
+					posting = match[2];
+				else if (match[1] == "HEAD")
+					head = match[2];
+				else if (match[1] == "XFEATURE_GZIP")
+					xfeature = match[2];
+			}
+		} catch (boost::regex_error& e) {
+			boostRegexExceptions(e);
+		}
+
+		// Reset the line.
+		line = "";
 	}
 
-	// Run the first set of tests.
-	if (testusenet1(hostname, port, username, password, group, xover,
-			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
-		return 1;
+	// Close the file.
+	file.close();
 
-	// Sleep for 2 seconds.
-	auto seconds(boost::posix_time::milliseconds(2000));
-	boost::this_thread::sleep(seconds);
-
-	// Run the second set of tests.
-	if (testusenet2(hostname, port, username, password, group, xover,
-			start, end, ssl, body, messageid, path, posting, head, xfeature) != 0)
-		return 1;
-
-	return 0;
+	// Check if any of the required options were empty.
+	if (username  == "" || password == "" || hostname == ""
+		|| port == "" || group == "" || ssl == ""
+		|| path == "" || xover == "")
+		return false;
+	else
+		return true;
 }
