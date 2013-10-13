@@ -504,6 +504,43 @@ namespace cppnntplib
 		bool posting = false;
 
 		/**
+		 * Did we already parse the overview format?
+		 * 
+		 * @private
+		 */
+		bool overviewfmtparsed = false;
+
+		/**
+		 * Is the server's overview format specifications the default
+		 * RFC2980/RFC3977 format, or does it contain extra lines?
+		 * 
+		 * @note If it has extra lines, XOVER/OVER will not be parsed,
+		 * it will just be printed on the screen.
+		 * @private
+		 */
+		bool overviewfmtspec = false;
+
+		/**
+		 * Send the LIST OVERVIEW.FMT command which gets the format
+		 * of the returned XOVER/OVER headers.
+		 * 
+		 * @private
+		 * 
+		 * @return bool = Did we receive the overview format?
+		 */
+		bool overviewformat();
+
+		/**
+		 * Parse response from LIST OVERVIEW.FMT
+		 * 
+		 * @note See overviewfmtspec above.
+		 * @private
+		 * 
+		 * @param finalbuffer = The buffer to parse.
+		 */
+		void parseoverviewfmt(std::string &finalbuffer);
+
+		/**
 		 * Parse response from XOVER.
 		 *
 		 * @note This goes over the headers returned by usenet

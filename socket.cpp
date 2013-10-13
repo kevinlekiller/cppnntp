@@ -548,12 +548,14 @@ namespace cppnntplib {
 	 * @param     response = The expected response from the NNTP server
 	 *                       for the passed command.
 	 * @param  finalbuffer = Pass a string reference to store the buffer.
+	 * @param     compress = Will the buffer be gzip compressed
+	 *                       (usually over/xover commands).
 	 * @return        bool = Did we succeed?
 	 */
 	bool socket::read_lines(const responsecodes &response,
-		std::string &finalbuffer) {
-		// Check if gzip compression is on.
-		if (compression)
+		std::string &finalbuffer, const bool &compress) {
+		// Check if gzip compression is on and if the buffer should be compressed.
+		if (compress && compression)
 			return read_compressed_lines(response, finalbuffer);
 
 		// Read until we find the period.

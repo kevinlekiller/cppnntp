@@ -475,6 +475,11 @@ namespace cppnntplib {
 	 * @return bool = Did we get the list of message-ids?
 	 */
 	bool nntp::newnews(const std::string &date, const std::string &time) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("NEWNEWS " + date + " " + time + " GMT"))
 			return false;
 
@@ -498,6 +503,11 @@ namespace cppnntplib {
 	 *                   a problem sending the command?
 	 */
 	bool nntp::stat(const std::string &anumber) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("STAT " + anumber))
 			return false;
 
@@ -520,6 +530,11 @@ namespace cppnntplib {
 	 * @return bool = Did we receive the article?
 	 */
 	bool nntp::last() {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("LAST"))
 			return false;
 
@@ -542,6 +557,11 @@ namespace cppnntplib {
 	 * @return bool = Did we receive the article?
 	 */
 	bool nntp::next() {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("NEXT"))
 			return false;
 
@@ -563,6 +583,11 @@ namespace cppnntplib {
 	 * @return    bool = Did we receive the article?
 	 */
 	bool nntp::article(const std::string &anumber) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("ARTICLE " + anumber))
 			return false;
 
@@ -584,6 +609,11 @@ namespace cppnntplib {
 	 * @return    bool = Did we receive the body?
 	 */
 	bool nntp::body(const std::string &anumber) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("BODY " + anumber))
 			return false;
 
@@ -609,6 +639,11 @@ namespace cppnntplib {
 	 */
 	bool nntp::body(const std::string &anumber, std::string &data,
 					const std::string &store) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("BODY " + anumber))
 			return false;
 
@@ -645,6 +680,11 @@ namespace cppnntplib {
 	 * @return    bool = Did we receive the header?
 	 */
 	bool nntp::head(const std::string &anumber) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		if (!sock.send_command("HEAD " + anumber))
 			return false;
 
@@ -666,11 +706,19 @@ namespace cppnntplib {
 	 * @return    bool = Did we receive the header?
 	 */
 	bool nntp::xover(const std::string &anumber) {
-		if (!sock.send_command("XOVER " + anumber))
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
 			return false;
+		}
+
+		if (!sock.send_command("XOVER " + anumber)) {
+			// Try using OVER instead.
+			if (!sock.send_command("OVER " + anumber))
+				return false;
+		}
 
 		std::string finalbuffer = "";
-		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer))
+		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer, true))
 			return false;
 
 		if (finalbuffer != "")
@@ -691,11 +739,19 @@ namespace cppnntplib {
 	 * @return  bool = Did we receive the headers?
 	 */
 	bool nntp::xover(const std::string &start, const std::string &end) {
-		if (!sock.send_command("XOVER " + start + '-' + end))
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
 			return false;
+		}
+
+		if (!sock.send_command("XOVER " + start + '-' + end)) {
+			// Try using OVER instead.
+			if (!sock.send_command("OVER " + start + '-' + end))
+				return false;
+		}
 
 		std::string finalbuffer = "";
-		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer))
+		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer, true))
 			return false;
 
 		if (finalbuffer != "")
@@ -718,17 +774,30 @@ namespace cppnntplib {
 	 * @return      bool = Did we receive the headers?
 	 */
 	bool nntp::xover(const std::string &anumber, bool &direction) {
+		if (!groupselected) {
+			std::cerr << "NNTP error: No group selected.\n";
+			return false;
+		}
+
 		std::string cmd;
 		if (direction)
 			cmd = "XOVER " + anumber + '-';
 		else
 			cmd = "XOVER -" + anumber;
 
-		if (!sock.send_command(cmd))
-			return false;
+		if (!sock.send_command(cmd)) {
+			// Try sending a OVER command instead.
+			if (direction)
+				cmd = "OVER " + anumber + '-';
+			else
+				cmd = "OVER -" + anumber;
+			
+			if (!sock.send_command(cmd))
+				return false;
+		}
 
 		std::string finalbuffer = "";
-		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS))
+		if (!sock.read_lines(RESPONSECODE_OVERVIEW_FOLLOWS, finalbuffer, true))
 			return false;
 
 		if (finalbuffer != "")
@@ -827,46 +896,54 @@ namespace cppnntplib {
 	}
 
 	/**
-	 * Parse response from GROUP command.
+	 * Send the LIST OVERVIEW.FMT command which gets the format
+	 * of the returned XOVER/OVER headers, then we parse it.
 	 * 
-	 * @note This takes the response from a GROUP command and
-	 * stores the results as objects.
 	 * @private
 	 * 
-	 * @param   finalbuffer = The buffer reference.
+	 * @return bool = Did we receive the overview format?
 	 */
-	void nntp::parsegroup(const std::string &finalbuffer) {
-		unsigned short line = 0;
-		std::string curline = "";
-		// Loop over every char in the buffer.
-		for (unsigned short i = 0; i < (finalbuffer.length() - 2); i++) {
-			// Skip spaces.
-			if (finalbuffer[i] == 32) {
-				switch (line++) {
-					// Skip the response code.
-					case 0:
-						break;
-					// Total amount of articles.
-					case 1:
-						grouptotal = std::stoi(curline);
-						break;
-					// Oldest article.
-					case 2:
-						groupoldest = std::stoi(curline);
-						break;
-					// Newest article.
-					case 3:
-						groupnewest = std::stoi(curline);
-						break;
-				}
-				curline = "";
-			}
-			else {
-				curline += finalbuffer[i];
+	bool nntp::overviewformat() {
+		// Check if we already parsed it.
+		if (overviewfmtparsed)
+			return true;
+
+		// Send the command to usenet we want to post.
+		if (!sock.send_command("LIST OVERVIEW.FMT"))
+			return false;
+
+		// Check if the response is good.
+		std::string finalbuffer = "";
+		if (!sock.read_lines(RESPONSECODE_LIST_RESPONSE, finalbuffer))
+			return false;
+
+		// Parse the overviewformat.
+		parseoverviewfmt(finalbuffer);
+		return true;
+	}
+
+	/**
+	 * Parse response from LIST OVERVIEW.FMT
+	 * 
+	 * @note See overviewfmtspec in header file.
+	 * @private
+	 * 
+	 * @param finalbuffer = The buffer to parse.
+	 */
+	void nntp::parseoverviewfmt(std::string &finalbuffer) {
+		// We parsed the overview, so set to true.
+		overviewfmtparsed = true;
+		unsigned short lines = 0;
+		// Loop over the buffer, count the lines.
+		for (unsigned short i = 0; i < finalbuffer.length(); i++) {
+			if (finalbuffer[i] == '\r') {
+				if (lines++ > 11)
+					break;
 			}
 		}
-		// Name of the group.
-		groupname = curline;
+		// If there are 10 lines, it's probably to spec.
+		if (lines == 10)
+			overviewfmtspec = true;
 	}
 
 	/**
@@ -880,6 +957,18 @@ namespace cppnntplib {
 	 * @param   finalbuffer = The buffer reference.
 	 */
 	void nntp::parseheaders(std::string &finalbuffer) {
+		// Check if we have the overview fmt, if we can't get it, print the buffer.
+		if (!overviewformat()) {
+			std::cout << finalbuffer;
+			return;
+		}
+
+		// If the server's overview fmt is not default spec, just print it.
+		if (!overviewfmtspec) {
+			std::cout << finalbuffer;
+			return;
+		}
+
 		bool respfound = false;
 
 		// Loop over the buffer and parse the header lines.
@@ -964,5 +1053,48 @@ namespace cppnntplib {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Parse response from GROUP command.
+	 * 
+	 * @note This takes the response from a GROUP command and
+	 * stores the results as objects.
+	 * @private
+	 * 
+	 * @param   finalbuffer = The buffer reference.
+	 */
+	void nntp::parsegroup(const std::string &finalbuffer) {
+		unsigned short line = 0;
+		std::string curline = "";
+		// Loop over every char in the buffer.
+		for (unsigned short i = 0; i < (finalbuffer.length() - 2); i++) {
+			// Skip spaces.
+			if (finalbuffer[i] == 32) {
+				switch (line++) {
+					// Skip the response code.
+					case 0:
+						break;
+					// Total amount of articles.
+					case 1:
+						grouptotal = std::stoi(curline);
+						break;
+					// Oldest article.
+					case 2:
+						groupoldest = std::stoi(curline);
+						break;
+					// Newest article.
+					case 3:
+						groupnewest = std::stoi(curline);
+						break;
+				}
+				curline = "";
+			}
+			else {
+				curline += finalbuffer[i];
+			}
+		}
+		// Name of the group.
+		groupname = curline;
 	}
 }

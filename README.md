@@ -57,6 +57,8 @@ LIST ACTIVE.TIMES (list all groups with their creators and create time, optional
 
 LIST NEWSGROUPS (displays list of all groups with descriptions, optional search wildmat)
 
+LIST OVERVIEW.FMT (overview format for OVER/XOVER)  
+
 LISTGROUP     (displays all the article numbers in the group or within a range or higher or lower)
 
 NEXT          (next article)
@@ -73,19 +75,5 @@ XFEATURE GZIP COMPRESS (compression for XOVER/OVER headers)
 
 XOVER         (need to store the headers in an array)
 
-
-Not implemented:
-
-IHAVE         (used with the MODE READER command)
-
-MODE READER   (used for the IHAVE command)
-
-LIST DISTRIB.PATS
-
-LIST OVERVIEW.FMT (overview format for OVER/XOVER)  
-
-OVER          (RFC3977 2006, none of my NNTP providers have this, it's the same as RFC2980 2000's XOVER which all my providers have)
-
-HDR/XHDR      (RFC3977 = HDR, none of my servers have HDR, this command displays the article number + the subect)
-
-LIST HEADERS  (used to set the fields displayed by HDR/XHDR so it can display more than just subject + anumber)
+Even though some commands in RFC 2980 or 3977 are not implemented here, many of them are
+not available on my NNTP servers, and some of them I wouldn't use anyway.

@@ -208,9 +208,12 @@ namespace cppnntplib
 		 * @param     response = The expected response from the NNTP server
 		 *                       for the passed command.
 		 * @param  finalbuffer = Pass a string reference to store the buffer.
+		 * @param     compress = Will the buffer be gzip compressed
+		 *                       (usually over/xover commands).
 		 * @return        bool = Did we succeed?
 		 */
-		bool read_lines(const responsecodes &response, std::string &finalbuffer);
+		bool read_lines(const responsecodes &response,
+				std::string &finalbuffer, const bool &compress = false);
 
 		/**
 		 * Read lines sent back from usenet used when using gzip compress.
