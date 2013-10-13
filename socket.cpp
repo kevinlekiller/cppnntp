@@ -131,14 +131,10 @@ namespace cppnntplib {
 						if (resp == "")
 							resp = resp + buffer[0] + buffer[1] + buffer[2];
 
-						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED) {
-							posting = true;
+						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED)
 							done = true;
-						}
-						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED) {
-							posting = false;
+						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED)
 							done = true;
-						}
 						else {
 							std::cerr << "Error connecting to usenet: ";
 							std::cerr.write(buffer.data(), bytesRead);
@@ -235,14 +231,10 @@ namespace cppnntplib {
 						if (resp == "")
 							resp = resp + buffer[0] + buffer[1] + buffer[2];
 
-						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED) {
-							posting = false;
+						if (std::stoi(resp) == RESPONSECODE_READY_POSTING_ALLOWED)
 							done = true;
-						}
-						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED) {
-							posting = false;
+						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED)
 							done = true;
-						}
 						else {
 							std::cerr << "Error connecting to usenet: ";
 							std::cerr.write(buffer.data(), bytesRead);
@@ -269,17 +261,6 @@ namespace cppnntplib {
 		delete ssl_sock;
 		ssl_sock = NULL;
 		return false;
-	}
-
-	/**
-	 * Return the private variable posting.
-	 *
-	 * @public
-	 *
-	 * @return bool = The value of posting.
-	 */
-	bool socket::poststatus() {
-		return posting;
 	}
 
 	/**
@@ -342,13 +323,11 @@ namespace cppnntplib {
 				std::cout.write(buffer.data(), bytesRead);
 
 				// Get the 3 first chars of the array, the response.
-				if (resp == "") {
+				if (resp == "")
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					code = std::stoi(resp);
-				}
 
 				// Check if we got the response.
-				if (code > 99)
+				if (std::stoi(resp) > 99)
 					done = true;
 				else {
 					std::cerr << "NNTP error: ";
@@ -447,11 +426,8 @@ namespace cppnntplib {
 
 				// Append the current buffer to the final buffer.
 				unsigned short iter = 0;
-				while (buffer[iter] != '\0') {
-					finalbuffer += buffer[iter];
-					if (iter++ == (bytesRead-1))
-						break;
-				}
+				while (iter < bytesRead)
+					finalbuffer += buffer[iter++];
 
 				// Get the 3 first chars of the array, the response.
 				if (resp == "")
@@ -511,22 +487,17 @@ namespace cppnntplib {
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response)
+					if (std::stoi(resp) != response) {
+						std::cerr << "NNTP error: Wrong response code from usenet.\n";
 						return false;
+					}
 				}
 
 				// Look for the terminator (.\r\n)
 				if (buffer[bytesRead-3] == '.'
 					&& buffer[bytesRead-2] == '\r'
-					&& buffer[bytesRead-1] == '\n') {
-					// Check if the response is good (convert resp to int).
-					if (std::stoi(resp) == response)
-						done = true;
-					else {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
-						return false;
-					}
-				}
+					&& buffer[bytesRead-1] == '\n')
+					done = true;
 			} while (!done);
 
 		} catch (boost::system::system_error& error) {
@@ -575,31 +546,23 @@ namespace cppnntplib {
 
 				// Append the current buffer to the final buffer.
 				unsigned short iter = 0;
-				while (buffer[iter] != '\0') {
-					finalbuffer += buffer[iter];
-					if (iter++ == (bytesRead-1))
-						break;
-				}
+				while (iter < bytesRead)
+					finalbuffer += buffer[iter++];
 
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response)
+					if (std::stoi(resp) != response) {
+						std::cerr << "NNTP error: Wrong response code from usenet.\n";
 						return false;
+					}
 				}
 
 				// Look for the terminator (.\r\n)
 				if (buffer[bytesRead-3] == '.'
 					&& buffer[bytesRead-2] == '\r'
-					&& buffer[bytesRead-1] == '\n') {
-					// Check if the response is good (convert resp to int).
-					if (std::stoi(resp) == response)
-						done = true;
-					else {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
-						return false;
-					}
-				}
+					&& buffer[bytesRead-1] == '\n')
+					done = true;
 			} while (!done);
 		} catch (boost::system::system_error& error) {
 			std::cerr << "NNTP error: " << error.what() << std::endl;
@@ -642,22 +605,17 @@ namespace cppnntplib {
 				// Get the 3 first chars of the array, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response)
+					if (std::stoi(resp) != response) {
+						std::cerr << "NNTP error: Wrong response code from usenet.\n";
 						return false;
+					}
 				}
 
 				// Look for the terminator (.\r\n)
 				if (buffer[bytesRead-3] == '.'
 					&& buffer[bytesRead-2] == '\r'
-					&& buffer[bytesRead-1] == '\n') {
-					// Check if the response is good (convert resp to int).
-					if (std::stoi(resp) == response)
-						done = true;
-					else {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
-						return false;
-					}
-				}
+					&& buffer[bytesRead-1] == '\n')
+					done = true;
 			} while (!done);
 		} catch (boost::system::system_error& error) {
 			std::cerr << "NNTP error: " << error.what() << std::endl;

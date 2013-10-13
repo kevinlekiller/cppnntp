@@ -33,6 +33,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::connect(const std::string &hostname,
 						const std::string &port, const bool &ssl) {
+		// If a SSL connection was requested, connect using SSL.
 		if (ssl) {
 			if (!sock.sslconnect(hostname, port))
 				return false;
@@ -41,8 +42,6 @@ namespace cppnntplib {
 			if (!sock.connect(hostname, port))
 				return false;
 		}
-
-		posting = sock.poststatus();
 		return true;
 	}
 
@@ -808,10 +807,8 @@ namespace cppnntplib {
 	/**
 	 * Post an article to usenet.
 	 * 
-	 * @note Posts a single article, it checks if you have posting
-	 * rights, however some servers tell us we can post when we cannot
-	 * (newshosting for example), so make sure to know if you have
-	 * posting privelege before hand.
+	 * @note Posts a single article, if you don't have posting
+	 * rights, this will return false.
 	 * @public
 	 * 
 	 * @param from = The person who is posting the message.
@@ -835,8 +832,6 @@ namespace cppnntplib {
 	 */
 	bool nntp::post(const std::string &from, const std::string &groups,
 					const std::string &subject, std::string &message) {
-		if (!posting)
-			return false;
 
 		// Send the command to usenet we want to post.
 		if (!sock.send_command("POST"))

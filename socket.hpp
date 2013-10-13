@@ -38,13 +38,6 @@ namespace cppnntplib
 		unsecure *tcp_sock;
 
 		/**
-		 * Has the server given us access to post articles?
-		 *
-		 * @private
-		 */
-		bool posting = false;
-
-		/**
 		 * Used for xfeature gzip compression.
 		 *
 		 * @private
@@ -121,15 +114,6 @@ namespace cppnntplib
 		 * @return     bool = Did we connect?
 		 */
 		bool sslconnect(const std::string &hostname, const std::string &port = "563");
-
-		/**
-		 * Return the private variable posting.
-		 *
-		 * @public
-		 *
-		 * @return bool = The value of posting.
-		 */
-		bool poststatus();
 
 		/**
 		 * Pass a command to usenet.

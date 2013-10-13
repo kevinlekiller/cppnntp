@@ -444,10 +444,8 @@ namespace cppnntplib
 		/**
 		 * Post an article to usenet.
 		 * 
-		 * @note Posts a single article, it checks if you have posting
-		 * rights, however some servers tell us we can post when we cannot
-		 * (newshosting for example), so make sure to know if you have
-		 * posting privelege before hand.
+		 * @note Posts a single article, if you don't have posting
+		 * rights, this will return false.
 		 * @public
 		 * 
 		 * @param from = The person who is posting the message.
@@ -491,17 +489,6 @@ namespace cppnntplib
 		 * @private
 		 */
 		socket sock;
-
-		/**
-		 * Are we allowed to post to the server?
-		 *
-		 * @note This is set when we connect to the server.
-		 * This is not accurate, my server sends back 200
-		 * (posting allowed) when connecting, however they still deny
-		 * me posting, but this does not hinder any functions.
-		 * @private
-		 */
-		bool posting = false;
 
 		/**
 		 * Did we already parse the overview format?
