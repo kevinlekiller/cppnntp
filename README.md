@@ -54,6 +54,8 @@ http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/#gett
 I will be using the logging from boost 1.54 eventually (boost.log 2.0).
 The info about it will be kept here.
 
+http://www.boost.org/doc/libs/1_54_0/libs/log/doc/html/index.html
+
 ------------------------------------------------------------------------
 
 Some info for me:
