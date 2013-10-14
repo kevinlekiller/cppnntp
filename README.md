@@ -1,11 +1,11 @@
-cppnntplib
+cppnntp
 ==========
 
-Work in progress Usenet / NNTP c++ library
+Work in progress Usenet / NNTP c++ program
 
 This is a project I'm currently working on, it's no where near ready
 yet, I won't offer any support so use at your own risk. Eventually
-it will be used in some CLI scripts I will make (downloading headers
+it will be used in a CLI program I will make (downloading headers
 and storing them in a database).
 
 I started messing around with libnntp (on googlecode), but I decided to
@@ -24,10 +24,33 @@ Zlib is required for XFEATURE GZIP COMPRESS.
 Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54, also
 compiles fine on boost 1.53.
 
-g++ examples.cpp cppnntplib/*.cpp -o "examples" -lboost_system -lpthread -lboost_regex -std=c++11 -lboost_thread -lssl -lcrypto -lz -lboost_iostreams
-
+g++ nntpexamples.cpp -o nntpexamples cppnntplib/*.cpp -lboost_iostreams -lboost_regex -lboost_system -lboost_thread -lcrypto -lpthread -lssl -lz -std=c++11
 
 ------------------------------------------------------------------------
+
+(Starting to mess with mongodb, so I'll keep info on it here)
+
+MongoDB:
+
+Installing:
+
+http://docs.mongodb.org/manual/installation/
+
+C++ drivers:
+
+http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/#getting-started-with-cpp-driver
+
+Compiling (based on the example from the mongodb manual):
+
+g++ mongoexamples.cpp -o mongoexamples mongo/*.cpp -lboost_filesystem -lboost_program_options -lboost_system -lboost_thread -lcrypto -lmongoclient -lssl -pthread -std=c++11
+
+------------------------------------------------------------------------
+
+I will be using the logging from boost 1.54 eventually (boost.log 2.0).
+The info about it will be kept here.
+
+------------------------------------------------------------------------
+
 Some info for me:
 
 
