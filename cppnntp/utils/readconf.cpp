@@ -2,33 +2,74 @@
 
 namespace cppnntp {
 
+	/**
+	 * Constructor.
+	 * 
+	 * @public
+	 * @note Runs checkconfig.
+	 */
 	readconf::readconf() {
 		checkconfig();
 	}
 
+	/**
+	 * Destructor.
+	 * 
+	 * @public
+	 */
 	readconf::~readconf() {
 	}
 
+	/**
+	 * Return the NNTP username.
+	 * 
+	 * @public
+	 */
 	std::string readconf::nntpuser() {
 		return NNTPUSER;
 	}
 
+	/**
+	 * Return the NNTP password.
+	 * 
+	 * @public
+	 */
 	std::string readconf::nntppass() {
 		return NNTPPASS;
 	}
 
+	/**
+	 * Return the NNTP hostname.
+	 * 
+	 * @public
+	 */
 	std::string readconf::nntphost() {
 		return NNTPHOST;
 	}
 
+	/**
+	 * Return the NNTP port.
+	 * 
+	 * @public
+	 */
 	std::string readconf::nntpport() {
 		return NNTPPORT;
 	}
 
+	/**
+	 * Return if the NNTP connection requires SSL.
+	 * 
+	 * @public
+	 */
 	bool readconf::nntpssl() {
 		return NNTPSSL;
 	}
 
+	/**
+	 * Check if there is a config file, load it, if not make one.
+	 * 
+	 * @private
+	 */
 	void readconf::checkconfig() {
 		// Check if configuration.cfg exists.
 		std::ifstream configfile("configuration.cfg");
@@ -49,6 +90,11 @@ namespace cppnntp {
 			readconfig();
 	}
 
+	/**
+	 * Read the configuration file.
+	 * 
+	 * @private
+	 */
 	void readconf::readconfig() {
 		std::string currentline;
 		std::ifstream configfile;
@@ -89,6 +135,11 @@ namespace cppnntp {
 		configfile.close();
 	}
 
+	/**
+	 * Create a configuration file.
+	 * 
+	 * @private
+	 */
 	void readconf::initiateconfig() {
 		std::ofstream configfile;
 		configfile.open("configuration.cfg");
