@@ -6,8 +6,10 @@ namespace cppnntp {
 	 * Constructor.
 	 *
 	 * @public
+	 * @param mongo DBclientConnection pointer.
 	 */
-	headers::headers() {
+	headers::headers(mongo::DBClientConnection * dbptr) {
+		db = dbptr;
 	}
 
 	/**
@@ -19,12 +21,18 @@ namespace cppnntp {
 	}
 
 	/**
-	 * Download new headers for active groups.
+	 * Download new headers for active groups or the specified one.
 	 * 
 	 * @public
 	 */
-	headers::forward() {
-		
+	bool headers::forward(const std::string &group) {
+		// Check if it's a specified group.
+		if (group == "") {
+			return true;
+		}
+		// Fetch the names of the groups and loop through them.
+		else {
+			return true;
+		}
 	}
-
 }

@@ -1,4 +1,6 @@
-#include "cppnntp/nntp/nntp.hpp"
+//#include "../nntp/nntp.hpp"
+#include <iostream>
+#include "mongo/client/dbclient.h"
 
 namespace cppnntp
 {
@@ -10,8 +12,9 @@ namespace cppnntp
 		 * Constructor.
 		 *
 		 * @public
+		 * @param mongo DBclientConnection pointer.
 		 */
-		headers();
+		headers(mongo::DBClientConnection * dbptr);
 
 		/**
 		 * Destructor.
@@ -21,10 +24,19 @@ namespace cppnntp
 		~headers();
 
 		/**
-		 * Download new headers for active groups.
+		 * Download new headers for active groups or the specified one.
 		 * 
 		 * @public
 		 */
-		forward();
+		bool forward(const std::string &group = "");
+
+	private:
+		/**
+		 * Take a connection pointer from the constructor, turn it
+		 * into an object (ex: db->query(...)).
+		 * 
+		 * @private
+		 */
+		mongo::DBClientConnection *db;
 	};
 }
