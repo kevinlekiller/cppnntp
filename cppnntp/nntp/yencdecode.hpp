@@ -1,8 +1,8 @@
 #include <boost/regex.hpp>
-#include "boostRegexExceptions.hpp"
+#include "../utils/boostRegexExceptions.hpp"
 #include <iostream>
 
-namespace cppnntplib
+namespace cppnntp
 {
 	class yencdecode
 	{

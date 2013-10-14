@@ -14,21 +14,30 @@ libnntp and I read the HTTP asio tutorials by captainOz on github
 which helped me tremendously (some pretty good tutorials if you want to
 learn more about asio sockets).
 
-If you want to test you can edit the config.cfg file (you'll have to
-change the article numbers), then compile. You can comment out parts
-of test.cpp or edit parts of it to do different things, it has comments
-and examples on what most of the things do.
-
-Zlib is required for XFEATURE GZIP COMPRESS.
-
-Compiled fine for me on g++ 4.8.1 on ubuntu 13.10, boost 1.54, also
-compiles fine on boost 1.53.
-
-g++ nntpexamples.cpp -o nntpexamples cppnntplib/*.cpp -lboost_iostreams -lboost_regex -lboost_system -lboost_thread -lcrypto -lpthread -lssl -lz -std=c++11
-
 ------------------------------------------------------------------------
 
-(Starting to mess with mongodb, so I'll keep info on it here)
+Requirements:
+
+Zlib is for header compression.
+
+Boost 1.54+
+
+openssl for SSL connections
+
+mongo c++ driver / mongodb
+
+g++ compiler with c++11 standard (only tested on linux)
+
+I'm running xubuntu 13.10 with boost 1.54, g++ 4.8.1, mongodb 2.4.6
+
+Compiling examples:
+
+g++ examples.cpp -o examples cppnntp/nntp/*.cpp cppnntp/utils/*.cpp -lboost_filesystem -lboost_iostreams -lboost_program_options -lboost_regex -lboost_system -lboost_thread -lcrypto -lmongoclient -lpthread -lssl -lz -pthread -std=c++11
+
+When you run it the first time it will go through a series of questions
+asking for your NNTP info / MongoDB info and create a config file.
+
+------------------------------------------------------------------------
 
 MongoDB:
 
@@ -39,10 +48,6 @@ http://docs.mongodb.org/manual/installation/
 C++ drivers:
 
 http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/#getting-started-with-cpp-driver
-
-Compiling (based on the example from the mongodb manual):
-
-g++ mongoexamples.cpp -o mongoexamples mongo/*.cpp -lboost_filesystem -lboost_program_options -lboost_system -lboost_thread -lcrypto -lmongoclient -lssl -pthread -std=c++11
 
 ------------------------------------------------------------------------
 

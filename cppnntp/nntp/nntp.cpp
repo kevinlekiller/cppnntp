@@ -1,6 +1,6 @@
 #include "nntp.hpp"
 
-namespace cppnntplib {
+namespace cppnntp {
 	/**
 	 * Constructor.
 	 *

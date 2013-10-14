@@ -10,7 +10,7 @@
 #include "socket.hpp"
 #include "yencdecode.hpp"
 
-namespace cppnntplib
+namespace cppnntp
 {
 	class nntp
 	{

@@ -7,7 +7,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include "responsecodes.hpp"
 
-namespace cppnntplib
+namespace cppnntp
 {
 	typedef boost::asio::ip::tcp::socket       unsecure;
 	typedef boost::asio::ssl::stream<unsecure> secure;
