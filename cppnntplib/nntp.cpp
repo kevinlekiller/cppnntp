@@ -190,7 +190,7 @@ namespace cppnntplib {
 		if (groupselected)
 			return grouptotal;
 		else {
-			std::cerr << "NNTP error: Group not selected.\n";
+			throw NNTPException("No group selected.");
 			return 0;
 		}
 	}
@@ -206,7 +206,7 @@ namespace cppnntplib {
 		if (groupselected)
 			return groupoldest;
 		else {
-			std::cerr << "NNTP error: Group not selected.\n";
+			throw NNTPException("No group selected.");
 			return 0;
 		}
 	}
@@ -222,7 +222,7 @@ namespace cppnntplib {
 		if (groupselected)
 			return groupnewest;
 		else {
-			std::cerr << "NNTP error: Group not selected.\n";
+			throw NNTPException("No group selected.");
 			return 0;
 		}
 	}
@@ -238,7 +238,7 @@ namespace cppnntplib {
 		if (groupselected)
 			return groupname;
 		else {
-			std::cerr << "NNTP error: Group not selected.\n";
+			throw NNTPException("No group selected.");
 			return "";
 		}
 	}
@@ -475,7 +475,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::newnews(const std::string &date, const std::string &time) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -503,7 +503,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::stat(const std::string &anumber) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -530,7 +530,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::last() {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -557,7 +557,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::next() {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -583,7 +583,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::article(const std::string &anumber) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -609,7 +609,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::body(const std::string &anumber) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -639,7 +639,7 @@ namespace cppnntplib {
 	bool nntp::body(const std::string &anumber, std::string &data,
 					const std::string &store) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -680,7 +680,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::head(const std::string &anumber) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -706,7 +706,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::xover(const std::string &anumber) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -739,7 +739,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::xover(const std::string &start, const std::string &end) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -774,7 +774,7 @@ namespace cppnntplib {
 	 */
 	bool nntp::xover(const std::string &anumber, bool &direction) {
 		if (!groupselected) {
-			std::cerr << "NNTP error: No group selected.\n";
+			throw NNTPException("No group selected.");
 			return false;
 		}
 
@@ -844,8 +844,9 @@ namespace cppnntplib {
 		std::string CRLF = "\r\n";
 
 		// Check if message ends in CRLF.
-		if (message[(message.length() - 2)] != '\r' && message[(message.length() - 1)] != '\n')
+		if (message[(message.length() - 2)] != '\r' && message[(message.length() - 1)] != '\n') {
 			message += CRLF;
+		}
 
 		// Try to send the article.
 		if (!sock.send_command

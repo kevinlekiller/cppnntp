@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <stdexcept>
 #include "socket.hpp"
 #include "yencdecode.hpp"
 
@@ -586,5 +587,14 @@ namespace cppnntplib
 		 * @private
 		 */
 		std::string groupname;
+	};
+
+	/**
+	 * Exceptions for class nntp.
+	 */
+	class NNTPException : std::runtime_error
+	{
+		public: NNTPException(const std::string& error) : runtime_error(error) {
+		}
 	};
 }

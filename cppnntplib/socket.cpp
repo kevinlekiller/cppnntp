@@ -84,13 +84,11 @@ namespace cppnntplib {
 	bool socket::connect(const std::string &hostname, const std::string &port) {
 		// Check if we are already connected.
 		if (is_connected()) {
-			std::cerr << "NNTP Error: Already connected to usenet.\n";
 			return true;
 		}
 
 		if (port == "443" || port == "563") {
-			std::cerr
-			<< "NNTP error: Using a SSL port on the non SSL connect function.\n";
+			throw NNTPSockException("Using a SSL port on the non SSL connect function.");
 			return false;
 		}
 
@@ -106,14 +104,12 @@ namespace cppnntplib {
 		try {
 			endpoint_iterator = resolver.resolve(query, err);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "Resolver error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 
-		if (err) {
-			std::cerr << "Boost error: " << err << std::endl;
+		if (err)
 			return false;
-		}
 
 		tcp_sock = new unsecure(io_service);
 		// loop through the available endpoints until we can connect without an error
@@ -136,14 +132,12 @@ namespace cppnntplib {
 						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED)
 							done = true;
 						else {
-							std::cerr << "Error connecting to usenet: ";
-							std::cerr.write(buffer.data(), bytesRead);
-							std::cerr << std::endl;
+							throw NNTPSockException("Wrong response code while connecting to usenet.");
 							return false;
 						}
 					} while (!done);
 				} catch (boost::system::system_error& error) {
-					std::cerr << "NNTP error: " << error.what() << std::endl;
+					throw NNTPSockException(error.what());
 					return false;
 				}
 				return true;
@@ -154,8 +148,6 @@ namespace cppnntplib {
 			// Increment the iterator.
 			++endpoint_iterator;
 		}
-		if (err)
-			std::cerr << "Boost error: " << err << std::endl;
 
 		// Unable to connect.
 		delete tcp_sock;
@@ -175,13 +167,11 @@ namespace cppnntplib {
 	bool socket::sslconnect(const std::string &hostname, const std::string &port) {
 		// Check if we are already connected.
 		if (is_connected()) {
-			std::cerr << "NNTP Error: Already connected to usenet.\n";
 			return true;
 		}
 
 		if (port == "119") {
-			std::cerr
-			<< "NNTP error: Using a non-SSL port on the SSL connect function.\n";
+			throw NNTPSockException("Using a non-SSL port on the SSL connect function.");
 			return false;
 		}
 
@@ -199,19 +189,13 @@ namespace cppnntplib {
 		// Try to resolve the query.
 		try {
 			endpoint_iterator = resolver.resolve(query, err);
-			if (err) {
-				std::cerr << "Resolver error: " << err << std::endl;
-				return false;
-			}
 		} catch (boost::system::system_error& error) {
-			std::cerr << "Resolver error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 
-		if (err) {
-			std::cerr << "Boost error: " << err << std::endl;
+		if (err)
 			return false;
-		}
 
 		ssl_sock = new secure(io_service, context);
 		// loop through the available endpoints until we can connect without an error
@@ -236,20 +220,16 @@ namespace cppnntplib {
 						else if (std::stoi(resp) == RESPONSECODE_READY_POSTING_PROHIBITED)
 							done = true;
 						else {
-							std::cerr << "Error connecting to usenet: ";
-							std::cerr.write(buffer.data(), bytesRead);
-							std::cerr << std::endl;
+							throw NNTPSockException("Wrong response code while connecting to usenet.");
 							return false;
 						}
 					} while (!done);
 				} catch (boost::system::system_error& error) {
-					std::cerr << "NNTP error: " << error.what() << std::endl;
+					throw NNTPSockException(error.what());
 					return false;
 				}
 				return true;
 			}
-			if (err)
-				std::cerr << "Boost error: " << err << std::endl;
 			// Close the socket.
 			ssl_sock->lowest_layer().close();
 
@@ -273,7 +253,7 @@ namespace cppnntplib {
 	 */
 	bool socket::send_command(const std::string command) {
 		if (!is_connected()) {
-			std::cerr << "NNTP error: Not connected to usenet.\n";
+			throw NNTPSockException("Not connected to usenet.");
 			return false;
 		}
 
@@ -287,7 +267,7 @@ namespace cppnntplib {
 			else
 				ssl_sock->write_some(boost::asio::buffer(cmd.c_str(), strlen(cmd.c_str())));
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return true;
@@ -330,14 +310,12 @@ namespace cppnntplib {
 				if (std::stoi(resp) > 99)
 					done = true;
 				else {
-					std::cerr << "NNTP error: ";
-					std::cerr.write(buffer.data(), bytesRead);
-					std::cerr << std::endl;
+					throw NNTPSockException("Wrong response code from usenet.");
 					return code;
 				}
 			} while (!done);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return code;
 		}
 		return code;
@@ -380,14 +358,12 @@ namespace cppnntplib {
 				if (std::stoi(resp) == response)
 					done = true;
 				else {
-					std::cerr << "NNTP error: ";
-					std::cerr.write(buffer.data(), bytesRead);
-					std::cerr << std::endl;
+					throw NNTPSockException("Wrong response code from usenet.");
 					return false;
 				}
 			} while (!done);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return true;
@@ -437,14 +413,12 @@ namespace cppnntplib {
 				if (std::stoi(resp) == response)
 					done = true;
 				else {
-					std::cerr << "NNTP error: ";
-					std::cerr.write(buffer.data(), bytesRead);
-					std::cerr << std::endl;
+					throw NNTPSockException("Wrong response code from usenet.");
 					return false;
 				}
 			} while (!done);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return true;
@@ -488,7 +462,7 @@ namespace cppnntplib {
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response) {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
+						throw NNTPSockException("Wrong response code from usenet.");
 						return false;
 					}
 				}
@@ -501,7 +475,7 @@ namespace cppnntplib {
 			} while (!done);
 
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return true;
@@ -553,7 +527,7 @@ namespace cppnntplib {
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response) {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
+						throw NNTPSockException("Wrong response code from usenet.");
 						return false;
 					}
 				}
@@ -565,7 +539,7 @@ namespace cppnntplib {
 					done = true;
 			} while (!done);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return true;
@@ -606,7 +580,7 @@ namespace cppnntplib {
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
 					if (std::stoi(resp) != response) {
-						std::cerr << "NNTP error: Wrong response code from usenet.\n";
+						throw NNTPSockException("Wrong response code from usenet.");
 						return false;
 					}
 				}
@@ -618,7 +592,7 @@ namespace cppnntplib {
 					done = true;
 			} while (!done);
 		} catch (boost::system::system_error& error) {
-			std::cerr << "NNTP error: " << error.what() << std::endl;
+			throw NNTPSockException(error.what());
 			return false;
 		}
 		return parsecompressedbuffer(finalbuffer);
@@ -655,8 +629,10 @@ namespace cppnntplib {
 		}
 
 		// Check if the first char is a x.
-		if (newbuffer[0] != 120)
+		if (newbuffer[0] != 120) {
+			throw NNTPSockException("Couldn't find a valid gzip stream header.");
 			return false;
+		}
 
 		// Try to decompress the data, catch zlib errors.
 		try {
@@ -680,7 +656,7 @@ namespace cppnntplib {
 
 			return true;
 		 } catch (boost::iostreams::zlib_error& e) {
-			std::cerr << e.what() << std::endl;
+			throw NNTPSockException(e.what());
 			return false;
 		}
 	}

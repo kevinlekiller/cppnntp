@@ -218,4 +218,13 @@ namespace cppnntplib
 		 */
 		bool parsecompressedbuffer(std::string &finalbuffer);
 	};
+
+	/**
+	 * Exceptions for class socket.
+	 */
+	class NNTPSockException : std::runtime_error
+	{
+		public: NNTPSockException(const std::string& error) : runtime_error(error) {
+		}
+	};
 }
