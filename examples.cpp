@@ -1,20 +1,7 @@
-#include <fstream>
-#include <cstdlib>
-#include <iostream>
-#include <boost/regex.hpp>
-#include <boost/thread.hpp>
-#include "mongo/client/dbclient.h"
-#include "cppnntp/nntp/nntp.hpp"
-#include "cppnntp/utils/readconf.hpp"
-
-// TODO: Mongo stuff/logging stuff.
+#include "examples.hpp"
 
 // Get the config options.
 cppnntp::readconf config;
-
-void start();
-void help();
-void examples();
 
 int main() {
 	start();

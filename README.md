@@ -32,7 +32,7 @@ I'm running xubuntu 13.10 with boost 1.54, g++ 4.8.1, mongodb 2.4.6
 
 Compiling examples:
 
-g++ examples.cpp -o examples cppnntp/nntp/*.cpp cppnntp/utils/*.cpp -lboost_filesystem -lboost_iostreams -lboost_program_options -lboost_regex -lboost_system -lboost_thread -lcrypto -lmongoclient -lpthread -lssl -lz -pthread -std=c++11
+g++ examples.cpp -o examples cppnntp/nntp/*.cpp cppnntp/utils/*.cpp cppnntp/processing/*.cpp -lboost_filesystem -lboost_iostreams -lboost_program_options -lboost_regex -lboost_system -lboost_thread -lcrypto -lmongoclient -lpthread -lssl -lz -pthread -std=c++11
 
 When you run it the first time it will go through a series of questions
 asking for your NNTP info / MongoDB info and create a config file.
@@ -48,6 +48,10 @@ http://docs.mongodb.org/manual/installation/
 C++ drivers:
 
 http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/#getting-started-with-cpp-driver
+
+Robomongo for managing mongo with a GUI:
+
+http://www.robomongo.org/
 
 ------------------------------------------------------------------------
 

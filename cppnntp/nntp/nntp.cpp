@@ -1,12 +1,20 @@
 #include "nntp.hpp"
 
 namespace cppnntp {
+
 	/**
 	 * Constructor.
 	 *
 	 * @public
+	 * 
+	 * @param autoconnect = Automatically connect and login to usenet.
 	 */
-	nntp::nntp() {
+	nntp::nntp(const bool &autoconnect) {
+		if (autoconnect) {
+			cppnntp::readconf config;
+			if (connect(config.nntphost(), config.nntpport(), config.nntpssl()))
+				login(config.nntpuser(), config.nntppass());
+		}
 	}
 
 	/**

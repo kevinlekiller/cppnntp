@@ -1,6 +1,8 @@
-//#include "../nntp/nntp.hpp"
+#pragma once
 #include <iostream>
 #include "mongo/client/dbclient.h"
+#include "../utils/readconf.hpp"
+#include "../nntp/nntp.hpp"
 
 namespace cppnntp
 {
@@ -24,13 +26,34 @@ namespace cppnntp
 		~headers();
 
 		/**
-		 * Download new headers for active groups or the specified one.
+		 * Fetch the active groups or the specified groups for new headers.
 		 * 
 		 * @public
+		 * 
+		 * @param group = (optional) Group name.
 		 */
-		bool forward(const std::string &group = "");
+		void forward(const std::string &group = "");
 
 	private:
+
+		/**
+		 * Fetch new article headers.
+		 * 
+		 * @private
+		 * 
+		 * @param   group = The group.
+		 * @param lastart = The newest article we have for the group.
+		 */
+		void loopforward(const std::string &group,
+						const std::string &lastart);
+
+		/**
+		 * Initiate the settings object.
+		 * 
+		 * @private
+		 */
+		cppnntp::readconf config;
+
 		/**
 		 * Take a connection pointer from the constructor, turn it
 		 * into an object (ex: db->query(...)).

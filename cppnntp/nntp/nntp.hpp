@@ -1,3 +1,4 @@
+#pragma once
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/system/system_error.hpp>
@@ -9,6 +10,7 @@
 #include <stdexcept>
 #include "socket.hpp"
 #include "yencdecode.hpp"
+#include "../utils/readconf.hpp"
 
 namespace cppnntp
 {
@@ -19,8 +21,10 @@ namespace cppnntp
 		 * Constructor.
 		 *
 		 * @public
+		 * 
+		 * @param autoconnect = Automatically connect and login to usenet.
 		 */
-		nntp();
+		nntp(const bool &autoconnect = false);
 
 		/**
 		 * Destructor.

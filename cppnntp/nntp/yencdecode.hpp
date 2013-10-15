@@ -1,3 +1,4 @@
+#pragma once
 #include <boost/regex.hpp>
 #include "../utils/boostRegexExceptions.hpp"
 #include <iostream>

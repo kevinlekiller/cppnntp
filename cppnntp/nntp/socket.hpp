@@ -1,3 +1,4 @@
+#pragma once
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/asio/ssl.hpp>
