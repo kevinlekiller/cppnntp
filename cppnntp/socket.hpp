@@ -18,6 +18,13 @@ namespace cppnntp
 	{
 	private:
 		/**
+		 * Output NNTP responses to cli.
+		 * 
+		 * @private
+		 */
+		bool echocli;
+
+		/**
 		 * Asio io_service, required for passing tasks to the socket.
 		 *
 		 * @private
@@ -60,6 +67,15 @@ namespace cppnntp
 		 * @public
 		 */
 		~socket();
+
+		/**
+		 * Toggle cli output status.
+		 * 
+		 * @public
+		 * 
+		 * @param output = Turn cli output on or off.
+		 */
+		bool clioutput(const bool &output = false);
 
 		/**
 		 * Toggle compression status.

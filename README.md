@@ -1,18 +1,7 @@
 cppnntp
 ==========
 
-Work in progress Usenet / NNTP c++ program
-
-This is a project I'm currently working on, it's no where near ready
-yet, I won't offer any support so use at your own risk. Eventually
-it will be used in a CLI program I will make (downloading headers
-and storing them in a database).
-
-I started messing around with libnntp (on googlecode), but I decided to
-make my own, I used some stuff from libnntp so thanks the creators of
-libnntp and I read the HTTP asio tutorials by captainOz on github
-which helped me tremendously (some pretty good tutorials if you want to
-learn more about asio sockets).
+Work in progress basic Usenet / NNTP c++ library.
 
 ------------------------------------------------------------------------
 
@@ -20,45 +9,15 @@ Requirements:
 
 Zlib is for header compression.
 
-Boost 1.54+
+Boost 1.49+
 
 openssl for SSL connections
 
-mongo c++ driver / mongodb
-
-g++ compiler with c++11 standard (only tested on linux)
-
-I'm running xubuntu 13.10 with boost 1.54, g++ 4.8.1, mongodb 2.4.6
+g++ compiler with c++11 standard
 
 Compiling examples:
 
-g++ examples.cpp -o examples cppnntp/nntp/*.cpp cppnntp/utils/*.cpp cppnntp/processing/*.cpp -lboost_filesystem -lboost_iostreams -lboost_program_options -lboost_regex -lboost_system -lboost_thread -lcrypto -lmongoclient -lpthread -lssl -lz -pthread -std=c++11
-
-When you run it the first time it will go through a series of questions
-asking for your NNTP info / MongoDB info and create a config file.
-
-------------------------------------------------------------------------
-
-MongoDB:
-
-Installing:
-
-http://docs.mongodb.org/manual/installation/
-
-C++ drivers:
-
-http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/#getting-started-with-cpp-driver
-
-Robomongo for managing mongo with a GUI:
-
-http://www.robomongo.org/
-
-------------------------------------------------------------------------
-
-I will be using the logging from boost 1.54 eventually (boost.log 2.0).
-The info about it will be kept here.
-
-http://www.boost.org/doc/libs/1_54_0/libs/log/doc/html/index.html
+g++ examples.cpp -o examples cppnntp/*.cpp -lboost_iostreams -lboost_regex -lboost_system -lcrypto -lpthread -lssl -lz -std=c++11
 
 ------------------------------------------------------------------------
 

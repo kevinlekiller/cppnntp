@@ -3,13 +3,16 @@
 #include <cstdlib>
 #include <iostream>
 #include <boost/regex.hpp>
-#include <boost/thread.hpp>
-#include "mongo/client/dbclient.h"
-#include "cppnntp/nntp/nntp.hpp"
-#include "cppnntp/processing/headers.hpp"
-#include "cppnntp/utils/readconf.hpp"
+#include <stdexcept>
+#include "cppnntp/nntp.hpp"
+
+std::string NNTP_USER = "";
+std::string NNTP_PASS = "";
+std::string NNTP_PORT = "";
+std::string NNTP_HOST = "";
+bool        NNTP_SSL = false;
 
 void start();
 void help();
-void examples();
+bool readconf();
 int main();

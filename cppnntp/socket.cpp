@@ -19,6 +19,17 @@ namespace cppnntp {
 	}
 
 	/**
+	 * Toggle cli output status.
+	 * 
+	 * @public
+	 * 
+	 * @param output = Turn cli output on or off.
+	 */
+	bool socket::clioutput(const bool &output) {
+		echocli = output;
+	}
+
+	/**
 	 * Toggle compression status.
 	 *
 	 * @note This is used by class nntp's xfeaturegzip function.
@@ -83,9 +94,8 @@ namespace cppnntp {
 	 */
 	bool socket::connect(const std::string &hostname, const std::string &port) {
 		// Check if we are already connected.
-		if (is_connected()) {
+		if (is_connected())
 			return true;
-		}
 
 		if (port == "443" || port == "563") {
 			throw NNTPSockException("Using a SSL port on the non SSL connect function.");
@@ -123,6 +133,9 @@ namespace cppnntp {
 					do {
 						boost::array<char, 1024> buffer;
 						size_t bytesRead = tcp_sock->read_some(boost::asio::buffer(buffer));
+
+						if (echocli)
+							std::cout.write(buffer.data(), bytesRead);
 
 						if (resp == "")
 							resp = resp + buffer[0] + buffer[1] + buffer[2];
@@ -166,9 +179,8 @@ namespace cppnntp {
 	 */
 	bool socket::sslconnect(const std::string &hostname, const std::string &port) {
 		// Check if we are already connected.
-		if (is_connected()) {
+		if (is_connected())
 			return true;
-		}
 
 		if (port == "119") {
 			throw NNTPSockException("Using a non-SSL port on the SSL connect function.");
@@ -212,6 +224,9 @@ namespace cppnntp {
 						boost::array<char, 1024> buffer;
 						size_t bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
+						if (echocli)
+							std::cout.write(buffer.data(), bytesRead);
+
 						if (resp == "")
 							resp = resp + buffer[0] + buffer[1] + buffer[2];
 
@@ -253,7 +268,6 @@ namespace cppnntp {
 	 */
 	bool socket::send_command(const std::string command) {
 		if (!is_connected()) {
-			throw NNTPSockException("Not connected to usenet.");
 			return false;
 		}
 
@@ -300,7 +314,8 @@ namespace cppnntp {
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
 				// Prints the buffer sent from usenet.
-				std::cout.write(buffer.data(), bytesRead);
+				if (echocli)
+					std::cout.write(buffer.data(), bytesRead);
 
 				// Get the 3 first chars of the array, the response.
 				if (resp == "")
@@ -348,7 +363,8 @@ namespace cppnntp {
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
 				// Prints the buffer sent from usenet.
-				std::cout.write(buffer.data(), bytesRead);
+				if (echocli)
+					std::cout.write(buffer.data(), bytesRead);
 
 				// Get the 3 first chars of the array, the response.
 				if (resp == "")
@@ -357,10 +373,8 @@ namespace cppnntp {
 				// Check if the response is good (convert resp to int).
 				if (std::stoi(resp) == response)
 					done = true;
-				else {
-					throw NNTPSockException("Wrong response code from usenet.");
+				else
 					return false;
-				}
 			} while (!done);
 		} catch (boost::system::system_error& error) {
 			throw NNTPSockException(error.what());
@@ -398,7 +412,8 @@ namespace cppnntp {
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
 				// Prints the buffer sent from usenet.
-				std::cout.write(buffer.data(), bytesRead);
+				if (echocli)
+					std::cout.write(buffer.data(), bytesRead);
 
 				// Append the current buffer to the final buffer.
 				unsigned short iter = 0;
@@ -412,10 +427,8 @@ namespace cppnntp {
 				// Check if the response is good (convert resp to int).
 				if (std::stoi(resp) == response)
 					done = true;
-				else {
-					throw NNTPSockException("Wrong response code from usenet.");
+				else
 					return false;
-				}
 			} while (!done);
 		} catch (boost::system::system_error& error) {
 			throw NNTPSockException(error.what());
@@ -456,15 +469,14 @@ namespace cppnntp {
 					bytesRead = ssl_sock->read_some(boost::asio::buffer(buffer));
 
 				// Prints the buffer sent from usenet without .CRLF
-				std::cout.write(buffer.data(), bytesRead-3);
+				if (echocli)
+					std::cout.write(buffer.data(), bytesRead-3);
 
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response) {
-						throw NNTPSockException("Wrong response code from usenet.");
+					if (std::stoi(resp) != response)
 						return false;
-					}
 				}
 
 				// Look for the terminator (.\r\n)
@@ -526,10 +538,8 @@ namespace cppnntp {
 				// Get the 3 first chars of the first buffer, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response) {
-						throw NNTPSockException("Wrong response code from usenet.");
+					if (std::stoi(resp) != response)
 						return false;
-					}
 				}
 
 				// Look for the terminator (.\r\n)
@@ -579,10 +589,8 @@ namespace cppnntp {
 				// Get the 3 first chars of the array, the response.
 				if (resp == "") {
 					resp = resp + buffer[0] + buffer[1] + buffer[2];
-					if (std::stoi(resp) != response) {
-						throw NNTPSockException("Wrong response code from usenet.");
+					if (std::stoi(resp) != response)
 						return false;
-					}
 				}
 
 				// Look for the terminator (.\r\n)
@@ -629,10 +637,8 @@ namespace cppnntp {
 		}
 
 		// Check if the first char is a x.
-		if (newbuffer[0] != 120) {
-			throw NNTPSockException("Couldn't find a valid gzip stream header.");
+		if (newbuffer[0] != 120)
 			return false;
-		}
 
 		// Try to decompress the data, catch zlib errors.
 		try {

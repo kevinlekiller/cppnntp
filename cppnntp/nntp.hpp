@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include "socket.hpp"
 #include "yencdecode.hpp"
-#include "../utils/readconf.hpp"
 
 namespace cppnntp
 {
@@ -21,10 +20,10 @@ namespace cppnntp
 		 * Constructor.
 		 *
 		 * @public
-		 * 
-		 * @param autoconnect = Automatically connect and login to usenet.
+		 *
+		 * @param clioutput = Output NNTP responses to CLI.
 		 */
-		nntp(const bool &autoconnect = false);
+		nntp(const bool &clioutput = true);
 
 		/**
 		 * Destructor.
@@ -33,6 +32,15 @@ namespace cppnntp
 		 * @public
 		 */
 		~nntp();
+
+		/**
+		 * Toggle cli output.
+		 * 
+		 * @public
+		 * 
+		 * @param output = Turn cli output on or off.
+		 */
+		bool clioutput(const bool &output = false);
 
 		/**
 		 * Connects to usenet.
@@ -209,9 +217,9 @@ namespace cppnntp
 		 * Send LIST ACTIVE command which displays a list of all
 		 * groups with their article numbers and if we can post
 		 * in them or not.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @return bool = Did we get the list of groups?
 		 */
 		bool listactive();
@@ -220,9 +228,9 @@ namespace cppnntp
 		 * Send LIST ACTIVE command which displays a list of groups
 		 * matching the wildmat (search query), with first and last
 		 * article numbers, and if we can post in them or not.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @param wildmat = (See RFC3977 for detailed info) Allows you
 		 * to search for groups (example: binaries*,*linux)
 		 * @return   bool = Did we get the list of groups?
@@ -232,9 +240,9 @@ namespace cppnntp
 		/**
 		 * Send LIST ACTIVE.TIMES command which displays a list of all
 		 * groups with their created time and creator.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @return bool = Did we get the list of groups?
 		 */
 		bool listactivetimes();
@@ -243,9 +251,9 @@ namespace cppnntp
 		 * Send LIST ACTIVE.TIMES command which displays a list of groups
 		 * matching the wildmat (search query), with their created time
 		 * and creator.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @param wildmat = (See RFC3977 for detailed info) Allows you
 		 * to search for groups (example: binaries*,*linux)
 		 * @return   bool = Did we get the list of groups?
@@ -255,9 +263,9 @@ namespace cppnntp
 		/**
 		 * Send LIST NEWSGROUPS command which displays a list of all
 		 * groups with their descriptions.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @return bool = Did we get the list of groups?
 		 */
 		bool listnewsgroups();
@@ -265,9 +273,9 @@ namespace cppnntp
 		/**
 		 * Send LIST NEWSGROUPS command which displays a list of groups
 		 * matching the wildmat (search query), with their descriptions.
-		 * 
+		 *
 		 * @public
-		 * 
+		 *
 		 * @param wildmat = (See RFC3977 for detailed info) Allows you
 		 * to search for groups (example: binaries*,*linux)
 		 * @return   bool = Did we get the list of groups?
@@ -277,10 +285,10 @@ namespace cppnntp
 		/**
 		 * Send NEWGROUPS command which displays a list of groups
 		 * since the specified UTC(GMT) time.
-		 * 
+		 *
 		 * @public
 		 * @example       newgroups("20131013", "143200");
-		 * 
+		 *
 		 * @param  date = The date in this format: yyyymmdd
 		 * @param  time = The time in this format: hhmmss
 		 * @return bool = Did we get the list of groups?
@@ -290,10 +298,10 @@ namespace cppnntp
 		/**
 		 * Send NEWNEWS command which displays of message-id's for
 		 * the selected group since the specified UTC(GMT) time.
-		 * 
+		 *
 		 * @public
 		 * @example       newnews("20131013", "143200");
-		 * 
+		 *
 		 * @param  date = The date in this format: yyyymmdd
 		 * @param  time = The time in this format: hhmmss
 		 * @return bool = Did we get the list of message-ids?
@@ -317,28 +325,28 @@ namespace cppnntp
 
 		/**
 		 * Send LAST command.
-		 * 
+		 *
 		 * @note This passes the LAST command to the NNTP server,
 		 * you must pass the GROUP command first, and a NEXT or STAT
 		 * command after that. It will display the previous article
-		 * before the NEXT or STAT commands (as long as there is a 
+		 * before the NEXT or STAT commands (as long as there is a
 		 * previous article in that group).
 		 * @public
-		 * 
+		 *
 		 * @return bool = Did we receive the article?
 		 */
 		bool last();
 
 		/**
 		 * Send NEXT command.
-		 * 
+		 *
 		 * @note This passes the NEXT command to the NNTP server,
 		 * you must pass the GROUP command first, if the group has
 		 * more then 1 article it will select the second article,
 		 * you can also use this after a STAT or LAST command (as long
 		 * as there is a next article in the group).
 		 * @public
-		 * 
+		 *
 		 * @return bool = Did we receive the article?
 		 */
 		bool next();
@@ -448,28 +456,28 @@ namespace cppnntp
 
 		/**
 		 * Post an article to usenet.
-		 * 
+		 *
 		 * @note Posts a single article, if you don't have posting
 		 * rights, this will return false.
 		 * @public
-		 * 
+		 *
 		 * @param from = The person who is posting the message.
 		 * @example = "Demo User" <nobody@example.net>
-		 * 
+		 *
 		 * @param groups = The group or list of groups.
 		 * @example = alt.binaries.test
 		 * @example = alt.binaries.test,alt.binaries.misc
-		 * 
+		 *
 		 * @param subject = The subject of the article.
 		 * @example = I am just a test article
-		 * 
+		 *
 		 * @param message = The message (body) of the article (you end it
 		 * with CRLF(\r\n)).
 		 * @example = This is just a test article.\r\n
 		 * @note Usenet has a limit of 512 chars per line when sending
 		 * a command (CRLF counts as 2 chars), if your message will
 		 * be longer than this you need to seperate each line with CRLF
-		 * 
+		 *
 		 * @return bool = Did the server receive the article?
 		 */
 		bool post(const std::string &from, const std::string &groups,
@@ -489,6 +497,13 @@ namespace cppnntp
 
 	private:
 		/**
+		 * Output NNTP responses to cli output.
+		 *
+		 * @private
+		 */
+		bool echocli = true;
+
+		/**
 		 * Create a socket instance.
 		 *
 		 * @private
@@ -497,7 +512,7 @@ namespace cppnntp
 
 		/**
 		 * Did we already parse the overview format?
-		 * 
+		 *
 		 * @private
 		 */
 		bool overviewfmtparsed = false;
@@ -505,7 +520,7 @@ namespace cppnntp
 		/**
 		 * Is the server's overview format specifications the default
 		 * RFC2980/RFC3977 format, or does it contain extra lines?
-		 * 
+		 *
 		 * @note If it has extra lines, XOVER/OVER will not be parsed,
 		 * it will just be printed on the screen.
 		 * @private
@@ -515,19 +530,19 @@ namespace cppnntp
 		/**
 		 * Send the LIST OVERVIEW.FMT command which gets the format
 		 * of the returned XOVER/OVER headers.
-		 * 
+		 *
 		 * @private
-		 * 
+		 *
 		 * @return bool = Did we receive the overview format?
 		 */
 		bool overviewformat();
 
 		/**
 		 * Parse response from LIST OVERVIEW.FMT
-		 * 
+		 *
 		 * @note See overviewfmtspec above.
 		 * @private
-		 * 
+		 *
 		 * @param finalbuffer = The buffer to parse.
 		 */
 		void parseoverviewfmt(std::string &finalbuffer);
@@ -546,11 +561,11 @@ namespace cppnntp
 
 		/**
 		 * Parse response from GROUP command.
-		 * 
+		 *
 		 * @note This takes the response from a GROUP command and
 		 * stores the results as objects.
 		 * @private
-		 * 
+		 *
 		 * @param   finalbuffer = The buffer reference.
 		 */
 		void parsegroup(const std::string &finalbuffer);
@@ -573,7 +588,7 @@ namespace cppnntp
 
 		/**
 		 * Oldest article number in the currently selected group.
-		 * 
+		 *
 		 * @private
 		 */
 		unsigned long groupoldest;

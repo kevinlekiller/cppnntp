@@ -7,14 +7,11 @@ namespace cppnntp {
 	 *
 	 * @public
 	 * 
-	 * @param autoconnect = Automatically connect and login to usenet.
+	 * @param clioutput = Output NNTP responses to CLI.
 	 */
-	nntp::nntp(const bool &autoconnect) {
-		if (autoconnect) {
-			cppnntp::readconf config;
-			if (connect(config.nntphost(), config.nntpport(), config.nntpssl()))
-				login(config.nntpuser(), config.nntppass());
-		}
+	nntp::nntp(const bool &clioutput) {
+		echocli = clioutput;
+		sock.clioutput(clioutput);
 	}
 
 	/**
@@ -25,6 +22,18 @@ namespace cppnntp {
 	 */
 	nntp::~nntp() {
 		disconnect();
+	}
+
+	/**
+	 * Toggle cli output.
+	 * 
+	 * @public
+	 * 
+	 * @param output = Turn cli output on or off.
+	 */
+	bool nntp::clioutput(const bool &output) {
+		echocli = output;
+		sock.clioutput(output);
 	}
 
 	/**
@@ -960,6 +969,9 @@ namespace cppnntp {
 	 * @param   finalbuffer = The buffer reference.
 	 */
 	void nntp::parseheaders(std::string &finalbuffer) {
+		if (!echocli)
+			return;
+
 		// Check if we have the overview fmt, if we can't get it, print the buffer.
 		if (!overviewformat()) {
 			std::cout << finalbuffer;
