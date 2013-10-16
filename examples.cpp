@@ -93,7 +93,7 @@ void start() {
 				std::string xover;
 				std::cout << "Please enter an article number or message-id.\n> ";
 				std::getline (std::cin, xover);
-				if (!nntp.head(xover))
+				if (!nntp.xover(xover))
 					continue;
 			}
 			else
