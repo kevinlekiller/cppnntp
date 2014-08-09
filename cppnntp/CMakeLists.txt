@@ -2,7 +2,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.55 REQUIRED
-    COMPONENTS date_time iostreams system)
+    COMPONENTS date_time iostreams regex system)
 
 find_package(OpenSSL)
 find_package(ZLIB)
