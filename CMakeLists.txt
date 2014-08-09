@@ -7,5 +7,6 @@ endif()
 
 add_executable(example examples.cpp examples.hpp)
 add_dependencies(example cppnntp)
+target_link_libraries(example cppnntp)
 
 add_subdirectory(cppnntp)
