@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(cppnntp CXX)
+project(cppnntp)
 
 if(("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"))
     set(CMAKE_CXX_FLAGS "-std=c++11")
