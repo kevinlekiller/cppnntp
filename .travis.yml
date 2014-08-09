@@ -18,7 +18,6 @@ install:
 
 script:
   - bin/configlet-linux-amd64 .
-  - cd boost_1_55_0
-  - ./bootstrap.sh
+  - (cd boost_1_55_0; ./bootstrap.sh; ./b2 --with-date_time --with-iostreams --with-regex --with-system link=static)
   - cmake -G "Unix Makefiles"
   - make
