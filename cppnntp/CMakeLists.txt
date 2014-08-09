@@ -1,0 +1,11 @@
+add_library(cppnntp
+    boostRegexExceptions.cpp
+    nntp.cpp
+    socket.cpp
+    yencdecode.cpp
+    boostRegexExceptions.hpp
+    nntp.hpp
+    responsecodes.hpp
+    socket.hpp
+    yencdecode.hpp
+    )
