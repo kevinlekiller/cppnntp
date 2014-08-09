@@ -9,7 +9,7 @@ before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq -d update
   - wget "http://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.gz"
-  - tar zxvf boost_1_55_0.tar.gz
+  - tar zxf boost_1_55_0.tar.gz
 
 install:
   - sudo apt-get -qq install libboost1.55-all-dev cmake g++-4.8
@@ -17,6 +17,7 @@ install:
 
 script:
   - bin/configlet-linux-amd64 .
-  - ls -l
+  - cd boost_1_55_0
+  - ./bootstrap.sh
   - cmake -G "Unix Makefiles"
   - make
