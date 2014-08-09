@@ -19,5 +19,5 @@ install:
 
 script:
   - (cd boost_1_55_0; ./bootstrap.sh; ./b2 --with-date_time --with-iostreams --with-regex --with-system link=static stage)
-  - cmake -G "Unix Makefiles" -DBOOST_INCLUDEDIR:PATH=./boost_1_55_0
+  - cmake -G "Unix Makefiles" -DBOOST_INCLUDEDIR:PATH=`pwd`/boost_1_55_0
   - make
