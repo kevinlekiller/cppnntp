@@ -3,6 +3,7 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.55 REQUIRED
     COMPONENTS date_time iostreams regex system)
+message(STATUS "Boost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}")
 
 find_package(OpenSSL)
 find_package(ZLIB)
