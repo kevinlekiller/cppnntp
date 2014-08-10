@@ -15,5 +15,5 @@ add_subdirectory(cppnntp)
 
 add_executable(example examples.cpp examples.hpp)
 add_dependencies(example cppnntp)
-target_include_directories(example ${Boost_INCLUDE_DIRS})
+target_include_directories(example PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(example cppnntp)
