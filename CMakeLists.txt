@@ -5,8 +5,9 @@ if(("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MAT
     set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
+add_subdirectory(cppnntp)
+
+target_include_directories(example ${Boost_INCLUDE_DIRS})
 add_executable(example examples.cpp examples.hpp)
 add_dependencies(example cppnntp)
 target_link_libraries(example cppnntp)
-
-add_subdirectory(cppnntp)
