@@ -5,6 +5,8 @@ Work in progress basic Usenet / NNTP c++ library.
 
 ------------------------------------------------------------------------
 
+[![Build Status](https://travis-ci.org/kevinlekiller/cppnntp.svg?branch=master)](https://travis-ci.org/kevinlekiller/cppnntp)
+
 Requirements:
 
 Zlib is for header compression.
@@ -70,3 +72,10 @@ XOVER         (need to store the headers in an array)
 
 Even though some commands in RFC 2980 or 3977 are not implemented here, many of them are
 not available on my NNTP servers, and some of them I wouldn't use anyway.
+
+
+------------------------------------------------------------------------
+
+Credits:
+@LegalizeAdulthood for the Cmake Build scripts.
+[libnntp](https://code.google.com/p/libnntp/) For many of the ideas used here.
