@@ -77,5 +77,6 @@ not available on my NNTP servers, and some of them I wouldn't use anyway.
 ------------------------------------------------------------------------
 
 Credits:
-@LegalizeAdulthood for the Cmake Build scripts.
+
+[LegalizeAdulthood](https://github.com/LegalizeAdulthood) for the Cmake Build scripts.  
 [libnntp](https://code.google.com/p/libnntp/) For many of the ideas used here.
