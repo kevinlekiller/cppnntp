@@ -23,6 +23,19 @@ g++ examples.cpp -o examples cppnntp/*.cpp -lboost_iostreams -lboost_regex -lboo
 
 ------------------------------------------------------------------------
 
+License:
+
+GPLv2
+
+------------------------------------------------------------------------
+
+Credits:
+
+[LegalizeAdulthood](https://github.com/LegalizeAdulthood) for the Cmake Build scripts.  
+[libnntp](https://code.google.com/p/libnntp/) For many of the ideas used here.
+
+------------------------------------------------------------------------
+
 Some info for me:
 
 
@@ -72,11 +85,3 @@ XOVER         (need to store the headers in an array)
 
 Even though some commands in RFC 2980 or 3977 are not implemented here, many of them are
 not available on my NNTP servers, and some of them I wouldn't use anyway.
-
-
-------------------------------------------------------------------------
-
-Credits:
-
-[LegalizeAdulthood](https://github.com/LegalizeAdulthood) for the Cmake Build scripts.  
-[libnntp](https://code.google.com/p/libnntp/) For many of the ideas used here.
